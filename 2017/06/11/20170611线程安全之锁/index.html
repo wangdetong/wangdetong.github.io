@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-cn">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="为了提高CPU的的使用率，出现了多线程，然而多线程影响了数据的安全，为了保护多线程下的数据安全，出现了锁的概念。现在给大家介绍一下我了解的锁…">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线程安全之锁">
+<meta property="og:url" content="http://yoursite.com/2017/06/11/20170611线程安全之锁/index.html">
+<meta property="og:site_name" content="iKiwi">
+<meta property="og:description" content="为了提高CPU的的使用率，出现了多线程，然而多线程影响了数据的安全，为了保护多线程下的数据安全，出现了锁的概念。现在给大家介绍一下我了解的锁…">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:updated_time" content="2019-06-22T03:32:12.588Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="线程安全之锁">
+<meta name="twitter:description" content="为了提高CPU的的使用率，出现了多线程，然而多线程影响了数据的安全，为了保护多线程下的数据安全，出现了锁的概念。现在给大家介绍一下我了解的锁…">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/11/20170611线程安全之锁/">
+
+
+
+
+
+  <title>线程安全之锁 | iKiwi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">iKiwi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/11/20170611线程安全之锁/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">线程安全之锁</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-11T00:00:00+08:00">
+                2017-06-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>为了提高CPU的的使用率，出现了多线程，然而多线程影响了数据的安全，为了保护多线程下的数据安全，出现了锁的概念。现在给大家介绍一下我了解的锁…</p>
+<a id="more"></a>
+
+<p>信号量 &amp; 锁的区别</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 信号量： 加锁 &amp; 释放锁 可以不在同一个线程</span></span><br><span class="line"><span class="comment">// 锁： 加锁 &amp; 释放锁 必须在同一个线程</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="pthread-mutex-t-互斥锁-（最常用）"><a href="#pthread-mutex-t-互斥锁-（最常用）" class="headerlink" title="pthread_mutex_t(互斥锁)（最常用）"></a>pthread_mutex_t(互斥锁)（最常用）</h2><p>应用场景：需要锁定一个资源，阻碍当前线程。比如：多线程处理 global 的数组。</p>
+<p>相关函数</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">PTHREAD_MUTEX_INITIALIZER <span class="comment">//初始化的宏</span></span><br><span class="line"><span class="keyword">int</span> pthread_mutex_init(pthread_mutex_t *mp,<span class="keyword">const</span> pthread_mutexattr_t *mattr);</span><br><span class="line"><span class="keyword">int</span> pthread_mutex_lock(pthread_mutex_t *mutex);</span><br><span class="line"><span class="keyword">int</span> pthread_mutex_unlock(pthread_mutex_t *mutex);</span><br><span class="line"><span class="comment">// trylock:使用非阻塞互斥锁锁定 (如果获取互斥锁失败，即返回值 !0,一般为EBUSY)</span></span><br><span class="line"><span class="keyword">int</span> pthread_mutex_trylock(pthread_mutex_t *mutex);</span><br><span class="line"><span class="keyword">int</span> pthread_mutex_destroy(pthread_mutex_t *mutex);</span><br><span class="line">锁的类型有：PTHREAD_MUTEX_NORMAL、PTHREAD_MUTEX_ERRORCHECK、PTHREAD_MUTEX_RECURSIVE 等</span><br><span class="line">pthread_mutex_t中的的方法返回值，<span class="number">0</span>代表成功，<span class="number">1</span>，<span class="number">2</span>…代表各种错误（EBUZY：<span class="number">16</span>），信号量 与 条件变量返回的值<span class="number">0</span> 也代表成功。</span><br><span class="line">当OSSpinLock公布不安全后，大家开始使用pthread_mutex_t了，见YYMemoryCache、PINMemeryCache</span><br></pre></td></tr></table></figure>
+
+<h2 id="pthread-spinlock-t-自旋锁"><a href="#pthread-spinlock-t-自旋锁" class="headerlink" title="pthread_spinlock_t(自旋锁)"></a>pthread_spinlock_t(自旋锁)</h2><p>相关函数</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>   pthread_spin_destroy(pthread_spinlock_t *);</span><br><span class="line"><span class="keyword">int</span>   pthread_spin_init(pthread_spinlock_t *, <span class="keyword">int</span>);</span><br><span class="line"><span class="keyword">int</span>   pthread_spin_lock(pthread_spinlock_t *);</span><br><span class="line"><span class="keyword">int</span>   pthread_spin_trylock(pthread_spinlock_t *);</span><br><span class="line"><span class="keyword">int</span>   pthread_spin_unlock(pthread_spinlock_t *);</span><br></pre></td></tr></table></figure>
+
+<p>看到<code>pthread_spinlock_t</code>之后想到了OSSpinLock,以为内部封装了<code>pthread_spinlock_t</code>，在网上搜了一下源码发现OSSpinLock 内部是封装了一个叫<code>pthread_lock_t</code>的锁，而不是<code>pthread_spinlock_t</code>，我猜测<code>pthread_lock_t</code>的也是实现了类似<code>pthread_spinlock_t</code>的功能。</p>
+<p>其实在Mac OS中是不支持<code>pthread_spinlock_t</code>的，只是Linux OS 中支持它。</p>
+<h2 id="❤️spin-lock-🆚-mutex❤️"><a href="#❤️spin-lock-🆚-mutex❤️" class="headerlink" title="❤️spin lock 🆚 mutex❤️"></a>❤️spin lock 🆚 mutex❤️</h2><h3 id="预备知识"><a href="#预备知识" class="headerlink" title="预备知识"></a>预备知识</h3><p>操作系统的线程调度：现代操作系统在管理普通线程时，通常采用时间片轮转算法(Round Robin，简称 RR)。每个线程会被分配一段时间片(quantum)，通常在 10-100 毫秒左右。当线程用完属于自己的时间片以后，就会被操作系统挂起，放入等待队列中，直到下一次被分配时间片。</p>
+<p>原子操作：狭义上的原子操作表示一条不可打断的操作，也就是说线程在执行操作过程中，不会被操作系统挂起，而是一定会执行完。在多处理器的情况下，能够被多个处理器同时执行的操作任然算不上原子操作。因此，真正的原子操作必须由硬件提供支持，比如 x86 平台上如果在指令前面加上 “LOCK” 前缀，对应的机器码在执行时会把总线锁住，使得其他 CPU不能再执行相同操作，从而从硬件层面确保了操作的原子性。其中，test_and_set就是原子性操作。</p>
+<h3 id="busy-waiting-amp-sleeping"><a href="#busy-waiting-amp-sleeping" class="headerlink" title="busy-waiting &amp; sleeping"></a>busy-waiting &amp; sleeping</h3><blockquote>
+<p>《APUE》中原文是这样：A spin lock is like a mutex, except that instead of blocking a process by sleeping, the process is blocked by busy-waiting (spinning) until the lock can be acquired.</p>
+</blockquote>
+<p>从实现原理上来讲:</p>
+<ul>
+<li>Mutex属于sleep-waiting类型的锁。</li>
+<li>Spin lock 属于busy-waiting类型的锁，<h3 id="举个例子"><a href="#举个例子" class="headerlink" title="举个例子"></a>举个例子</h3>例如在一个双核的机器上有两个线程(线程A和线程B)，它们分别运行在Core0和Core1上。<br>如果线程A想要通过pthread_mutex_lock操作去得到一个临界区的锁，而此时这个锁正被线程B所持有，那么线程A就会被阻塞(blocking)，让出自己的时间片，Core0 会在此时进行上下文切换(Context Switch)将线程A置于等待队列中，此时Core0就可以运行其他的任务(例如另一个线程C)而不必进行忙等待。<br>如果线程A是使用pthread_spin_lock操作去请求锁，那么线程A就会一直在 Core0上进行忙等待并不停的进行锁请求，直到得到这个锁为止(直到用完CPU分配的时间片而被系统挂起)。</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>（1）Mutex适合对锁操作非常频繁的场景，并且具有更好的适应性。尽管相比spin lock它会花费更多的开销（主要是上下文切换），但是它能适合实际开发中复杂的应用场景，在保证一定性能的前提下提供更大的灵活度。</p>
+<p>（2）spin lock的lock/unlock性能更好(花费更少的cpu指令)，但是它只适应用于临界区运行时间很短的场景。而在实际软件开发中，除非程序员对自己的程序的锁操作行为非常的了解，否则使用spin lock不是一个好主意(通常一个多线程程序中对锁的操作有数以万次，如果失败的锁操作(contended lock requests)过多的话就会浪费很多的时间进行空等待)。</p>
+<p>（3）更保险（保守）的方法或许是先使用 Mutex，然后如果对性能还有进一步的需求，可以尝试使用spin lock进行调优</p>
+<p><strong>不再安全的OSSpinLock</strong><br>OSSpinLock内部封装了pthread_lock_t而不是pthread_spinlock_t，我猜测既然命名为OSSpinLock，应该pthread_lock_t的也是实现了类似pthread_spinlock_t的功能<br>OSSpinLock不安全，不是说pthread_spinlock_t不安全</p>
+<p>原因:在低优先级线程拿到锁时，高优先级线程进入忙等(busy-wait)状态，消耗大量 CPU 时间，从而导致低优先级线程拿不到 CPU 时间，也就无法完成任务并释放锁。这种问题被称为优先级反转。源于：<a href="https://blog.ibireme.com/2016/01/16/spinlock_is_unsafe_in_ios/" target="_blank" rel="noopener">不再安全的 OSSpinLock</a></p>
+<p>解决方案：当公布OSSpinLock不安全后，大家纷纷转向了pthread_mutex:<br>有消息称，苹果在新系统中已经优化了 pthread_mutex 的性能，所以它看上去和 OSSpinLock 差距并没有那么大了。</p>
+<p>facebook的KVOController在2016年5月17日时的一个Commit里将所有OSSpinLock替换成了pthread_mutex，可参看这个commit。</p>
+<p>查看 CoreFoundation 的源码能够发现，苹果至少在 2014 年就发现了这个问题，并把 CoreFoundation 中的 spinlock 替换成了 pthread_mutex，具体变化可以查看这两个文件：CFInternal.h(855.17)、CFInternal.h(1151.16)。苹果自己发现问题后，并没有更新 OSSpinLock 的文档，也没有告知开发者，这有些让人失望。</p>
+<h2 id="dispatch-semaphore-t-信号量"><a href="#dispatch-semaphore-t-信号量" class="headerlink" title="dispatch_semaphore_t(信号量)"></a>dispatch_semaphore_t(信号量)</h2><blockquote>
+<p>适用场景：比如有3台打印机，有5个线程要使用打印机，那么semaphore就会先记录好有3台，每成功被申请一次，就减1，减到0时，后面的申请就会被拒绝。</p>
+</blockquote>
+<p>semaphore不属于锁的范畴，不过当把semaphore 的资源数量为 0 即 dispatch_semaphore_create(0)时，就可以当做mutex使用了</p>
+<h3 id="相关函数"><a href="#相关函数" class="headerlink" title="相关函数"></a>相关函数</h3><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//value:信号量,即可用资源的数量</span></span><br><span class="line">dispatch_semaphore_t  dispatch_semaphore_create(<span class="keyword">long</span> value);</span><br><span class="line"><span class="comment">// 当返回值为0时表示当前并没有线程等待其处理的信号量，其处理的信号量的值加1即可。</span></span><br><span class="line"><span class="comment">// 当返回值不为0时，表示其当前有（一个或多个）线程等待其处理的信号量，并且该函数唤醒了一个等待的线程</span></span><br><span class="line"><span class="keyword">long</span> dispatch_semaphore_signal(dispatch_semaphore_t dsema)</span><br><span class="line"><span class="comment">// 当其返回0时表示在timeout之前，该函数所处的线程被成功唤醒。</span></span><br><span class="line"><span class="comment">// 当其返回不为0时，表示timeout发生。</span></span><br><span class="line"><span class="keyword">long</span> dispatch_semaphore_wait(dispatch_semaphore_t dsema, dispatch_time_t timeout)；</span><br></pre></td></tr></table></figure>
+
+<h3 id="关于信号量，一般可以用停车来比喻"><a href="#关于信号量，一般可以用停车来比喻" class="headerlink" title="关于信号量，一般可以用停车来比喻"></a>关于信号量，一般可以用停车来比喻</h3><p>停车场剩余4个车位，那么即使同时来了四辆车也能停的下。如果此时来了五辆车，那么就有一辆需要等待。信号量的值就相当于剩余车位的数目，dispatch_semaphore_wait函数就相当于来了一辆车，dispatch_semaphore_signal就相当于走了一辆车。停车位的剩余数目在初始化的时候就已经指明了（dispatch_semaphore_create（long value）），调用一次dispatch_semaphore_signal，剩余的车位就增加一个；调用一次dispatch_semaphore_wait剩余车位就减少一个；当剩余车位为0时，再来车（即调用dispatch_semaphore_wait）就只能等待。有可能同时有几辆车等待一个停车位。有些车主没有耐心，给自己设定了一段等待时间，这段时间内等不到停车位就走了，如果等到了就开进去停车。而有些车主就像把车停在这，所以就一直等下去。</p>
+<h2 id="semaphore-例子-阻碍当前线程"><a href="#semaphore-例子-阻碍当前线程" class="headerlink" title="semaphore 例子(阻碍当前线程)"></a>semaphore 例子(阻碍当前线程)</h2><h3 id="关于dispatch-semaphore的使用"><a href="#关于dispatch-semaphore的使用" class="headerlink" title="关于dispatch_semaphore的使用"></a>关于dispatch_semaphore的使用</h3><p>当然demo中的semaphore可以换成pthread_mutex_t，👇两个例子一定要确保 block里面是在其他线程执行的，否则会出现死锁！！！⚠️</p>
+<p>其中 TMCache中的同步获取数据就是 内部调用异步接口通过semaphore处理数据同步的</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//把异步返回数据 同步到当前线程</span></span><br><span class="line">   dispatch_semaphore_t semaphore = dispatch_semaphore_create(<span class="number">0</span>);</span><br><span class="line">   [HttpManager requestDemoWithBolck:^(<span class="built_in">NSDictionary</span> *dic)&#123;</span><br><span class="line">	       dispatch_semaphore_signal(semaphore);</span><br><span class="line">&#125;]</span><br><span class="line">   dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);</span><br></pre></td></tr></table></figure>
+
+<p>看另外一个例子：关于 AFN 的 AFURLSessionManager中的</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">NSArray</span> *)tasksForKeyPath:(<span class="built_in">NSString</span> *)keyPath &#123;</span><br><span class="line">    __block <span class="built_in">NSArray</span> *tasks = <span class="literal">nil</span>;</span><br><span class="line">    dispatch_semaphore_t semaphore = dispatch_semaphore_create(<span class="number">0</span>);</span><br><span class="line">    [<span class="keyword">self</span>.session getTasksWithCompletionHandler:^(<span class="built_in">NSArray</span> *dataTasks, <span class="built_in">NSArray</span> *uploadTasks, <span class="built_in">NSArray</span> *downloadTasks) &#123;</span><br><span class="line">		<span class="comment">// 省略...</span></span><br><span class="line">        dispatch_semaphore_signal(semaphore);</span><br><span class="line">    &#125;];</span><br><span class="line">    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);</span><br><span class="line">    <span class="keyword">return</span> tasks;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="signal-amp-wait-成对出现"><a href="#signal-amp-wait-成对出现" class="headerlink" title="signal &amp; wait 成对出现"></a>signal &amp; wait 成对出现</h3><p>使用signal以确保编译器release掉dispatch_semaphore_t时的value与初始值一致（dispatch_semaphore_signal &amp; dispatch_semaphore_wait成对出现）， 否则会EXC_BAD_INSTRUCTION</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)test_semaphore_wait_signal&#123;</span><br><span class="line">    <span class="comment">// dispatch_semaphore_create 的参数是信号量的 初始值</span></span><br><span class="line">    dispatch_semaphore_t semaphore = dispatch_semaphore_create(<span class="number">2</span>);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"1"</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i++) &#123;</span><br><span class="line">        dispatch_time_t t = dispatch_time(DISPATCH_TIME_NOW, <span class="number">2</span>*<span class="number">1000</span>*<span class="number">1000</span>*<span class="number">1000</span>);<span class="comment">//2秒</span></span><br><span class="line">        <span class="keyword">if</span> (dispatch_semaphore_wait(semaphore, t) == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="built_in">NSLog</span>(<span class="string">@"success , i=%d"</span>,i);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="built_in">NSLog</span>(<span class="string">@"timeout , i=%d"</span>,i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"end"</span>);</span><br><span class="line">    <span class="comment">//注释掉下面的代码，导致信号量与初始值不一致， 会EXC_BAD_INSTRUCTION</span></span><br><span class="line">    dispatch_semaphore_signal(semaphore);</span><br><span class="line">    dispatch_semaphore_signal(semaphore);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>经测试发现，当信号量的value &lt; 初始值会 crash，而当 信号量的value &gt; 初始值时正常不crash。<br>打印一下semaphore:主要看它的 value &amp; orig</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;OS_dispatch_semaphore: semaphore[0x6080002819f0] = &#123; xrefcnt = 0x1, refcnt = 0x1, port = 0x0, value = 4, orig = 5 &#125;&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="pthread-cond-t-条件变量"><a href="#pthread-cond-t-条件变量" class="headerlink" title="pthread_cond_t(条件变量)"></a>pthread_cond_t(条件变量)</h2><p>场景：(生产者-消费者模式)B线程和A线程之间有合作关系，当A线程完成某件事情之前，B线程会等待。当A线程完成某件事情之后，需要让B线程知道，然后B线程从等待状态中被唤醒，然后继续做自己要做的事情。</p>
+<p>⚠️条件变量必须要跟互斥锁联合起来用⚠️<br>相关函数</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">PTHREAD_COND_INITIALIZER</span><br><span class="line"><span class="keyword">int</span> pthread_cond_init(pthread_cond_t *restrict cond, <span class="keyword">const</span> pthread_condattr_t *restrict attr);</span><br><span class="line"><span class="keyword">int</span> pthread_cond_destroy(pthread_cond_t *cond);</span><br><span class="line"><span class="keyword">int</span> pthread_cond_signal(pthread_cond_t *cond);<span class="comment">//通知一个线程</span></span><br><span class="line"><span class="keyword">int</span> pthread_cond_broadcast(pthread_cond_t *cond); <span class="comment">//通知所以wait线程</span></span><br><span class="line"><span class="keyword">int</span> pthread_cond_wait(pthread_cond_t *restrict cond, pthread_mutex_t *restrict mutex);</span><br><span class="line"><span class="keyword">int</span> pthread_cond_timedwait(pthread_cond_t *restrict cond, pthread_mutex_t *restrict mutex, <span class="keyword">const</span> <span class="keyword">struct</span> timespec *restrict abstime);</span><br></pre></td></tr></table></figure>
+
+<p>简单测试一下signal &amp; broadcast 区别</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)test_condition_variable&#123;</span><br><span class="line">    pthread_cond_init(&amp;condition_variable_signal, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line">    __<span class="keyword">weak</span> <span class="keyword">typeof</span>(<span class="keyword">self</span>) weak_self = <span class="keyword">self</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">            [weak_self test_pthread_cond_wait:i];</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//// 测试 得signal后，通知的一个线程并不是优先级高的线程</span></span><br><span class="line"><span class="comment">//    dispatch_async(dispatch_get_global_queue(2, 0), ^&#123;</span></span><br><span class="line"><span class="comment">//        [weak_self test_pthread_cond_wait:9999];</span></span><br><span class="line"><span class="comment">//    &#125;);</span></span><br><span class="line">    </span><br><span class="line">    <span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">        sleep(<span class="number">2</span>);</span><br><span class="line"><span class="comment">//        [weak_self test_pthread_cond_signal];</span></span><br><span class="line">        [weak_self test_pthread_cond_broadcast];</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)test_pthread_cond_wait:(<span class="built_in">NSInteger</span> )i&#123;</span><br><span class="line">    pthread_mutex_lock(&amp;mutex);</span><br><span class="line">    <span class="keyword">while</span> (name.length == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"before wait i:%ld"</span>,i);</span><br><span class="line">        pthread_cond_wait(&amp;condition_variable_signal, &amp;mutex);</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"after wait i:%ld"</span>,i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"get:name = %@ and i:%ld"</span>,name,i);</span><br><span class="line">    pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)test_pthread_cond_signal &#123;</span><br><span class="line">    pthread_mutex_lock(&amp;mutex);</span><br><span class="line">    name = <span class="string">@"wangdt"</span>;</span><br><span class="line">    pthread_cond_signal(&amp;condition_variable_signal);<span class="comment">//事情做完了之后要扔信号给等待的线程告诉他们做完了</span></span><br><span class="line">    pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"set:name = %@"</span>,name);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)test_pthread_cond_broadcast &#123;</span><br><span class="line">    pthread_mutex_lock(&amp;mutex);</span><br><span class="line">    name = <span class="string">@"wangdt"</span>;</span><br><span class="line">    pthread_cond_broadcast(&amp;condition_variable_signal);<span class="comment">//事情做完了之后要扔信号给等待的线程告诉他们做完了</span></span><br><span class="line">    pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"set:name = %@"</span>,name);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="生产者消费者demo"><a href="#生产者消费者demo" class="headerlink" title="生产者消费者demo"></a>生产者消费者demo</h3><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> consumer () &#123; <span class="comment">// 消费者  </span></span><br><span class="line">    pthread_mutex_lock(&amp;mutex);</span><br><span class="line">    <span class="keyword">while</span> (data == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        pthread_cond_wait(&amp;condition_variable_signal, &amp;mutex); <span class="comment">// 等待数据</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// --- 有新的数据，以下代码负责处理 ↓↓↓↓↓↓</span></span><br><span class="line">    <span class="comment">// temp = data;</span></span><br><span class="line">    <span class="comment">// --- 有新的数据，以上代码负责处理 ↑↑↑↑↑↑</span></span><br><span class="line">    pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">void</span> producer () &#123;  </span><br><span class="line">    pthread_mutex_lock(&amp;mutex);</span><br><span class="line">    <span class="comment">// 生产数据</span></span><br><span class="line">   <span class="comment">// data = …;</span></span><br><span class="line">    pthread_cond_signal(&amp;condition_variable_signal); <span class="comment">// 发出信号给消费者，告诉他们有了新的数据</span></span><br><span class="line">    pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="为什么需要配合pthread-mutex-lock？"><a href="#为什么需要配合pthread-mutex-lock？" class="headerlink" title="为什么需要配合pthread_mutex_lock？"></a>为什么需要配合pthread_mutex_lock？</h4><p>因为，我们加锁的最初原因是为了保证数据的线程安全，配合mutex的目的也就是为了保证 data的安全</p>
+<h4 id="为什么需要-while-而不是-if-？"><a href="#为什么需要-while-而不是-if-？" class="headerlink" title="为什么需要 while 而不是 if ？"></a>为什么需要 while 而不是 if ？</h4><p>如果发出pthread_cond_signal，线程从pthread_cond_wait唤醒，在pthread_cond_wait未返回之前，如果有别人写一个线程去把这个data搞成NULL了，期间没有申请mutex锁。那么pthread_cond_wait应该不能被唤醒，还得继续等待，但是 if{}不会再次判断data的值，而while可以再次判断！</p>
+<h2 id="Objective-C中的锁"><a href="#Objective-C中的锁" class="headerlink" title="Objective-C中的锁"></a>Objective-C中的锁</h2><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@protocol</span> <span class="title">NSLocking</span></span></span><br><span class="line">- (<span class="keyword">void</span>)lock;</span><br><span class="line">- (<span class="keyword">void</span>)unlock;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>它们都实现了NSLocking协议：NSLock、NSRecursiveLock、NSCondition、NSConditionLock</p>
+<h3 id="NSCondition"><a href="#NSCondition" class="headerlink" title="NSCondition"></a>NSCondition</h3><p>实现原理：封装了一个互斥锁和条件变量！</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)test_NSCondition &#123;</span><br><span class="line">    <span class="built_in">NSCondition</span>* lock = [[<span class="built_in">NSCondition</span> alloc] init];</span><br><span class="line">    <span class="built_in">dispatch_async</span>(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, <span class="number">0</span>), ^&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt; <span class="number">3</span>; i++) &#123;</span><br><span class="line">            sleep(<span class="number">2</span>);</span><br><span class="line">            <span class="keyword">if</span> (i == <span class="number">2</span>) &#123;</span><br><span class="line">                <span class="built_in">NSLog</span>(<span class="string">@"before broadcast i:%d"</span>,i);</span><br><span class="line">                [lock lock];</span><br><span class="line">                [lock signal];</span><br><span class="line"><span class="comment">//                [lock broadcast];</span></span><br><span class="line">                [lock unlock];</span><br><span class="line">                <span class="built_in">NSLog</span>(<span class="string">@"after broadcast i:%d"</span>,i);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"before wait"</span>);</span><br><span class="line">        [lock lock];</span><br><span class="line">        [lock wait];</span><br><span class="line">        [lock unlock];</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"after wait"</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="NSConditionLock"><a href="#NSConditionLock" class="headerlink" title="NSConditionLock"></a>NSConditionLock</h3><p>实现原理：内部持有一个 NSCondition 对象，它的本质就是一个生产者-消费者模型。“条件被满足”可以理解为生产者提供了新的内容。在PINCache中的PINDiskCache使用了NSConditionLock</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#define kBegin 0</span></span><br><span class="line"><span class="meta">#define kEnd 1</span></span><br><span class="line">- (<span class="keyword">void</span>)test_NSConditionLock&#123;</span><br><span class="line">    <span class="built_in">NSConditionLock</span> *conditionLock = [[<span class="built_in">NSConditionLock</span> alloc] initWithCondition:kBegin];<span class="comment">// 初始化状态为 kBegin</span></span><br><span class="line">    <span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">        sleep(<span class="number">2</span>);</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"1"</span>);</span><br><span class="line">        [conditionLock lock];</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"2"</span>);</span><br><span class="line">        <span class="comment">// - (void)unlockWithCondition:(NSInteger)condition; //解锁，并且设置lock.condition = condition</span></span><br><span class="line">        [conditionLock unlockWithCondition:kEnd];</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"3"</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"4"</span>);</span><br><span class="line">    <span class="comment">// - (void)lockWhenCondition:(NSInteger)condition; //condition与内部相同才会获取锁对象并立即返回，否则阻塞线程直到condition相同</span></span><br><span class="line">    [conditionLock lockWhenCondition:kEnd];</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"5"</span>);</span><br><span class="line">    [conditionLock unlock];</span><br><span class="line">    conditionLock = <span class="literal">nil</span>;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"finished"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="NSLock"><a href="#NSLock" class="headerlink" title="NSLock"></a>NSLock</h3><p>NSLock 只是在内部封装了一个属性为 PTHREAD_MUTEX_ERRORCHECK的 pthread_mutex</p>
+<p>⚠️NSLock的lock &amp; unlock 必须在同一个线程(<a href="https://developer.apple.com/reference/foundation/nslock" target="_blank" rel="noopener">https://developer.apple.com/reference/foundation/nslock</a>)
+trylock的返回值：YES代表成功，NO代表失败，避免与底层的函数返回混淆（pthread_mutex_t相关函数返回 0 代表成功，!0代表失败）</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSLock</span> *theLock = [[<span class="built_in">NSLock</span> alloc] init];</span><br><span class="line">[theLock lock];</span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">	[theLock unlock];</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>错误提示： * -[NSLock unlock]: lock ( ‘(null)’) unlocked from thread which did not lock it</p>
+</blockquote>
+<h3 id="NSRecursiveLock"><a href="#NSRecursiveLock" class="headerlink" title="NSRecursiveLock"></a>NSRecursiveLock</h3><p>NSRecursiveLock 内部封装了一个属性为 PTHREAD_MUTEX_RECURSIVE的 pthread_mutex。<br>递归锁允许递归调用，也就是lock多次，只是存在一个计数器累加1，等到unlock的时候，将计数器递减1。</p>
+<p>举例说明：<br>在 YYThreadSafeArray 中的锁类型是资源为 1 的dispatch_semaphore_t (之前是OSSpinLock) 。在使用YYThreadSafeArray时，如果在enumerateObjectsUsingBlock里面再调用array.count的话 YYThreadSafeArray 会死锁，enumerateObjectsUsingBlock上有lock ，count也有lock了，所以造成了死锁。<br>如果把YYThreadSafeArray中的锁类型改成NSRecursiveLock的话，就不会造成死锁。（为什么作者没有改呢？我感觉还是因为 NSRecursiveLock执行效率低，不如 dispatch_semaphore_t）</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)test_YYThreadSafeArray &#123;    </span><br><span class="line">    YYThreadSafeArray *arr = [[YYThreadSafeArray alloc] init];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;<span class="number">100</span>; i++) &#123;</span><br><span class="line">        [arr addObject:@(i)];</span><br><span class="line">    &#125;</span><br><span class="line">    [arr enumerateObjectsUsingBlock:^(<span class="keyword">id</span>  _Nonnull obj, <span class="built_in">NSUInteger</span> idx, <span class="built_in">BOOL</span> * _Nonnull stop) &#123;</span><br><span class="line">        [arr count];</span><br><span class="line">        <span class="keyword">if</span> (idx == arr.count - <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="built_in">NSLog</span>(<span class="string">@" index:%ld , count:%ld"</span>,idx,arr.count);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;];</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"finished"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="synchronized"><a href="#synchronized" class="headerlink" title="@synchronized"></a>@synchronized</h3><p>这其实是一个 OC 层面的锁， 主要是通过牺牲性能换来语法上的简洁与可读。我们知道 @synchronized 后面需要紧跟一个 OC 对象，它实际上是把这个对象当做锁来使用。这是通过一个哈希表来实现的，OC 在底层使用了一个互斥锁的数组(你可以理解为锁池)，通过对对象去哈希值来得到对应的互斥锁。</p>
+<p>参考：<br><a href="http://www.parallellabs.com/2010/01/31/pthreads-programming-spin-lock-vs-mutex-performance-analysis/" target="_blank" rel="noopener">❤️Pthreads并行编程之spin lock与mutex性能对比分析❤️</a><br><a href="https://bestswifter.com/ios-lock/#nsrecursivelock" target="_blank" rel="noopener">深入理解 iOS 开发中的锁</a><br><a href="https://casatwy.com/pthreadde-ge-chong-tong-bu-ji-zhi.html" target="_blank" rel="noopener">pthread的各种同步机制</a><br><a href="http://blog.csdn.net/yeyuangen/article/details/37593533" target="_blank" rel="noopener">深入理解条件变量</a><br><a href="http://docs.oracle.com/cd/E19253-01/819-7051/6n919hpag/index.html" target="_blank" rel="noopener">oracle多线程编程指南</a><br><a href="http://www.cnblogs.com/snailHL/p/3906112.html" target="_blank" rel="noopener">关于dispatch_semaphore的使用</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/08/20170508聊一聊YYCache/" rel="next" title="聊一聊YYCache">
+                <i class="fa fa-chevron-left"></i> 聊一聊YYCache
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/12/20170712线程安全之gcd/" rel="prev" title="线程安全之gcd">
+                线程安全之gcd <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTMzNy81OTA1"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">wangdetong</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#pthread-mutex-t-互斥锁-（最常用）"><span class="nav-number">1.</span> <span class="nav-text">pthread_mutex_t(互斥锁)（最常用）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pthread-spinlock-t-自旋锁"><span class="nav-number">2.</span> <span class="nav-text">pthread_spinlock_t(自旋锁)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#❤️spin-lock-🆚-mutex❤️"><span class="nav-number">3.</span> <span class="nav-text">❤️spin lock 🆚 mutex❤️</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#预备知识"><span class="nav-number">3.1.</span> <span class="nav-text">预备知识</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#busy-waiting-amp-sleeping"><span class="nav-number">3.2.</span> <span class="nav-text">busy-waiting &amp; sleeping</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#举个例子"><span class="nav-number">3.3.</span> <span class="nav-text">举个例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">3.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dispatch-semaphore-t-信号量"><span class="nav-number">4.</span> <span class="nav-text">dispatch_semaphore_t(信号量)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#相关函数"><span class="nav-number">4.1.</span> <span class="nav-text">相关函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关于信号量，一般可以用停车来比喻"><span class="nav-number">4.2.</span> <span class="nav-text">关于信号量，一般可以用停车来比喻</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#semaphore-例子-阻碍当前线程"><span class="nav-number">5.</span> <span class="nav-text">semaphore 例子(阻碍当前线程)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#关于dispatch-semaphore的使用"><span class="nav-number">5.1.</span> <span class="nav-text">关于dispatch_semaphore的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#signal-amp-wait-成对出现"><span class="nav-number">5.2.</span> <span class="nav-text">signal &amp; wait 成对出现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pthread-cond-t-条件变量"><span class="nav-number">6.</span> <span class="nav-text">pthread_cond_t(条件变量)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#生产者消费者demo"><span class="nav-number">6.1.</span> <span class="nav-text">生产者消费者demo</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#为什么需要配合pthread-mutex-lock？"><span class="nav-number">6.1.1.</span> <span class="nav-text">为什么需要配合pthread_mutex_lock？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#为什么需要-while-而不是-if-？"><span class="nav-number">6.1.2.</span> <span class="nav-text">为什么需要 while 而不是 if ？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Objective-C中的锁"><span class="nav-number">7.</span> <span class="nav-text">Objective-C中的锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NSCondition"><span class="nav-number">7.1.</span> <span class="nav-text">NSCondition</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSConditionLock"><span class="nav-number">7.2.</span> <span class="nav-text">NSConditionLock</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSLock"><span class="nav-number">7.3.</span> <span class="nav-text">NSLock</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSRecursiveLock"><span class="nav-number">7.4.</span> <span class="nav-text">NSRecursiveLock</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#synchronized"><span class="nav-number">7.5.</span> <span class="nav-text">@synchronized</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangdetong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

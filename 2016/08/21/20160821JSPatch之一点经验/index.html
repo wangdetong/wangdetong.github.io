@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-cn">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="献给哪些没有JS基础的同学  JSPatch 基础用法JSPatchConvertor翻译器JSPatch常见问题：可以解决你80%的问题了，要仔细看看😯">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JSPatch之一点经验">
+<meta property="og:url" content="http://yoursite.com/2016/08/21/20160821JSPatch之一点经验/index.html">
+<meta property="og:site_name" content="iKiwi">
+<meta property="og:description" content="献给哪些没有JS基础的同学  JSPatch 基础用法JSPatchConvertor翻译器JSPatch常见问题：可以解决你80%的问题了，要仔细看看😯">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="http://yoursite.com/2016/08/21/20160821JSPatch之一点经验/20160821JSPatch%E4%B9%8B%E4%B8%80%E7%82%B9%E7%BB%8F%E9%AA%8C/a.png">
+<meta property="og:updated_time" content="2019-06-22T03:32:12.366Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JSPatch之一点经验">
+<meta name="twitter:description" content="献给哪些没有JS基础的同学  JSPatch 基础用法JSPatchConvertor翻译器JSPatch常见问题：可以解决你80%的问题了，要仔细看看😯">
+<meta name="twitter:image" content="http://yoursite.com/2016/08/21/20160821JSPatch之一点经验/20160821JSPatch%E4%B9%8B%E4%B8%80%E7%82%B9%E7%BB%8F%E9%AA%8C/a.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/08/21/20160821JSPatch之一点经验/">
+
+
+
+
+
+  <title>JSPatch之一点经验 | iKiwi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">iKiwi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/08/21/20160821JSPatch之一点经验/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">JSPatch之一点经验</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-21T00:00:00+08:00">
+                2016-08-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>献给哪些没有JS基础的同学</p>
+</blockquote>
+<p><a href="https://github.com/bang590/JSPatch/wiki" target="_blank" rel="noopener">JSPatch 基础用法</a><br><a href="http://bang590.github.io/JSPatchConvertor/" target="_blank" rel="noopener">JSPatchConvertor翻译器</a><br><a href="https://github.com/bang590/JSPatch/wiki/JSPatch-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98#stringwithformat" target="_blank" rel="noopener">JSPatch常见问题</a>：可以解决你80%的问题了，要仔细看看😯</p>
+<a id="more"></a>
+<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><h3 id="1-msg-blk-is-not-a-function-In-‘blk-0-“”-documentName-’-‘blk’-is-false"><a href="#1-msg-blk-is-not-a-function-In-‘blk-0-“”-documentName-’-‘blk’-is-false" class="headerlink" title="1. msg: blk is not a function. (In ‘blk(0, “”, documentName)’, ‘blk’ is false),"></a>1. msg: blk is not a function. (In ‘blk(0, “”, documentName)’, ‘blk’ is false),</h3><p>判断block是否为空时，不要用 if (blk != null) ，应该使用if (blk)。<br>因为当block为空时，if (blk != null)时，不知怎么的是YES，执行了下面的blk(0, “”, documentName);，可能和JS有关吧。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">loadDocument_inView: function(documentName, webView)&#123;</span><br><span class="line">	var blk = <span class="keyword">self</span>.valueForKey(<span class="string">"fileDownloadCallback"</span>)     <span class="comment">//get member variables</span></span><br><span class="line">	<span class="keyword">if</span> (blk != null) &#123;</span><br><span class="line">		blk(<span class="number">0</span>, <span class="string">""</span>, documentName);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-TypeError-cb-apply-is-not-a-function？"><a href="#2-TypeError-cb-apply-is-not-a-function？" class="headerlink" title="2. TypeError: cb.apply is not a function？"></a>2. TypeError: cb.apply is not a function？</h3><p>(1)block的参数格式写的有问题，比如：block从JS 传到OC时，需要用block包装一下，<br>block(“id”,blk)<br><a href="https://github.com/bang590/JSPatch/issues/570" target="_blank" rel="noopener">JSPatch issues中</a></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">function loadXMLDoc(url) &#123;</span><br><span class="line">	require(<span class="string">"JCPBUtil"</span>);</span><br><span class="line">	JCPBUtil.loadStringFromURL_method_withArgs_completion(url, <span class="string">"GET"</span>, null, block(<span class="string">"NSString *"</span>, <span class="string">"id"</span>, function(result, error) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!error) &#123;</span><br><span class="line">                console.log(<span class="string">"loadXMLDoc result:"</span> + result);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;));</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 其中 block参数格式写错了，应该为：block("NSString *, id", function(result, error) &#123;&#125;)</span></span><br></pre></td></tr></table></figure>
+
+<p>(2)block的参数类型是不是有typedef定义的类型，JSCore无法转这种typedef后的参数类型。<br><a href="https://github.com/bang590/JSPatch/issues/733" target="_blank" rel="noopener">JSPatch issues中</a></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// JS-&gt;OC 传block，格式没有错</span></span><br><span class="line">defineClass(<span class="string">'B'</span>,&#123;&#125;, &#123;</span><br><span class="line">selectBlock: function(blk) &#123;</span><br><span class="line">                console.log(<span class="string">"test"</span>);</span><br><span class="line">                return self.ORIGselectBlock(block('id',blk));</span><br><span class="line">            &#125;,</span><br><span class="line">            &#125;);</span><br><span class="line">            </span><br><span class="line"><span class="comment">// 但是，在OC中，定义的Block类型是typedef后的类型，导致问题</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">NSArray</span> &lt;Contact *&gt; ContactArray;</span><br><span class="line">[A selectBlock:^(ContactArray *members) &#123;</span><br><span class="line">...</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+
+<p>(3)解决的方法只有在OC中修改 Contact 为 NSArray，无法热修复了…</p>
+<p>测试了一下，上面的错误 ContactArray类型 作为 block参数 时才出现的错误，而ContactArray类型作为function参数是没问题，比如</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">void</span>)doSomething:(ContactArray *)arr&#123;</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"arrayCount:%ld"</span>,arr.count);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-NSMutableArray的sortUsingComparator-失效"><a href="#3-NSMutableArray的sortUsingComparator-失效" class="headerlink" title="3. NSMutableArray的sortUsingComparator 失效"></a>3. NSMutableArray的sortUsingComparator 失效</h3><p>这可能是JSCore的锅，在群里讨论过。<br>例子：testArray的顺序没有变化，还是乱序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">defineClass(‘TestViewController&apos;, &#123;</span><br><span class="line">	letMeTest: function() &#123;</span><br><span class="line">self.testArray().sortUsingComparator(block(&apos;NSString*,NSString*&apos;,function(obj1, obj2) &#123;</span><br><span class="line">	var result = 0;</span><br><span class="line">	if (obj1.integerValue() &lt; obj2.integerValue())&#123;</span><br><span class="line">		result = -1;</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">		result = 1;</span><br><span class="line">	&#125;</span><br><span class="line">	return result;                                                                                     </span><br><span class="line">	&#125;));</span><br><span class="line">&#125;,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h2><h3 id="1-for循环相关"><a href="#1-for循环相关" class="headerlink" title="1. for循环相关"></a>1. for循环相关</h3><blockquote>
+<p>在for-in 与 经典for循环选择时，强烈建议使用 经典for循环:<br><code>for(var i=0;i&lt;arry.count();i++)</code></p>
+</blockquote>
+<p>介绍一下for-in：</p>
+<ol>
+<li>当array.count()==0时，js 还会执行一下for的函数体，因此需要在for-in 前需要加上 if（array.count() &gt; 0）{for-in}</li>
+<li>for var i in array{}其中的 i 代表 索引值！</li>
+<li>bug描述 :使用for in 时，遍历的array的item是比较复杂的string，</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">比如： “ ***MetaImage\n (null)\n (null)\n 0\n &#123;\n id = 58aa68e270ec537fa615616f;\n url = \&quot;https://***58aa68e270ec537fa615616f\&quot;;\n&#125;\n”，此时for var i in array 中的 i 会有两个值：obj 与 clsName，而不是正常的索引值 1,2,3…，导致遍历次数不对！</span><br><span class="line">最后还是用 经典for循环来解决的！</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-NSArray-注意"><a href="#2-NSArray-注意" class="headerlink" title="2. NSArray 注意"></a>2. NSArray 注意</h3><ol>
+<li>数组长度：<br>JS 方式：array.toJS().length<br>OC 方式：array.count()</li>
+<li>获取数组元素：<br>JS 方式：array[i]<br>OC 方式：array.objectAtIndex(i);//array[i]失效</li>
+<li>NSArray / NSString / NSDictionary 不会自动转成对应的JS类型，怎么在.js中使用它们？（但是 JS类型会自动转换为OC类型，尽情的调用oc的set() 就行）<br>(1)通过toJS()方法 转成对应的JS类型（可以用js的精简方法操作）<br>(2)像普通 NSObject 一样使用它们 (可以熟练的使用OC的方法进行操作)</li>
+</ol>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSString</span>：</span><br><span class="line"><span class="comment">//OC</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSString</span> * stringJS;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSString</span> * stringOC;</span><br><span class="line"><span class="comment">//js</span></span><br><span class="line"><span class="comment">//方法一</span></span><br><span class="line">var string = <span class="keyword">self</span>.stringJS().toJS();<span class="comment">//js:String</span></span><br><span class="line">var jsStr = string+<span class="string">"JS"</span>;</span><br><span class="line"><span class="keyword">self</span>.setStringJS(jsStr);</span><br><span class="line"><span class="comment">//方法二</span></span><br><span class="line">var ocStr = <span class="keyword">self</span>.stringOC();<span class="comment">//oc:NSString</span></span><br><span class="line">var ocMutableStr = ocStr.mutableCopy();<span class="comment">//NSString -&gt;NSMutableString</span></span><br><span class="line">ocMutableStr.appendString(<span class="string">"OC"</span>);</span><br><span class="line"><span class="keyword">self</span>.setStringOC(ocMutableStr);</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-hidden"><a href="#3-hidden" class="headerlink" title="3. hidden?"></a>3. hidden?</h3><p>一些get方法被使用时： isHidden 代替 hidden，isOn 代替 on</p>
+<h3 id="4-Struct"><a href="#4-Struct" class="headerlink" title="4. Struct"></a>4. Struct</h3><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UIScreen</span>.mainScreen().bounds().size().width()  改为：<span class="built_in">UIScreen</span>.mainScreen().bounds().width</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-get懒加载"><a href="#5-get懒加载" class="headerlink" title="5. get懒加载"></a>5. get懒加载</h3><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// OC</span></span><br><span class="line">- (<span class="built_in">NSString</span> *) datePicker&#123;</span><br><span class="line">     <span class="keyword">if</span>(! _datePicker)&#123;</span><br><span class="line">          _datePicker =….     </span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> _datePicker;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 此时的下划线，在JSPatch中的提到方法名的下划线不一样，需要用JSPatch的 kvc的方法来修复</span></span><br><span class="line">	<span class="comment">// js</span></span><br><span class="line">	datePicker: function() &#123;</span><br><span class="line">		if (!self.valueForKey('_datePicker')) &#123;</span><br><span class="line">			var datePicker = ...;</span><br><span class="line">          self.setValue_forKey(datePicker, '_datePicker');</span><br><span class="line">		&#125;</span><br><span class="line">		return self.valueForKey('_datePicker');</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><ol>
+<li><img src="20160821JSPatch%E4%B9%8B%E4%B8%80%E7%82%B9%E7%BB%8F%E9%AA%8C/a.png" alt="logo"></li>
+<li>调试时，为了找到错误点，看情况打印信息：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">po [msg toObject]</span><br><span class="line">po log</span><br><span class="line">selectorName</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>如果被调试的instance 是 单例，将无法用safari 进行debug，只能通过 console.log()来调试了</li>
+</ol>
+<h2 id="JSPatch-Convertor-’s-不足："><a href="#JSPatch-Convertor-’s-不足：" class="headerlink" title="JSPatch Convertor ’s 不足："></a>JSPatch Convertor ’s 不足：</h2><ol>
+<li>“_”翻译不到位：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">“_fun1” -&gt;“fun1”时，oc中一个下划线 翻译成JS 应该是 两个；</span><br><span class="line">“fun1” -&gt;“____fun1” 时 oc中两个下划线 翻译成JS 应该是 四个;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>在oc中的需要 [self class]用来调用加方法，热修复时 翻译成 self.class() ，JSPatch 不识别，需要 把[self class] 换成 类名</li>
+<li>block中含有if else时，经常漏掉 if else</li>
+<li>NSString.stringWithFormat(“%@”, array.count()) 会 把 “%@”漏成 “%”</li>
+</ol>
+<h2 id="应该注意"><a href="#应该注意" class="headerlink" title="应该注意"></a>应该注意</h2><p>JSPatch 也会 hook 住对象的 forwradInvocation 方法，并且 swizzling 相应的 method ，使其指向转发 IMP ,由于 aspects 也是基于这两者实现的，使用时在64机器有可能会有问题，需要注意一下。<br>分析<a href="http://wereadteam.github.io/2016/06/30/Aspects/" target="_blank" rel="noopener">Aspects</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/26/20160726使用PLCrashReporter/" rel="next" title="使用PLCrashReporter">
+                <i class="fa fa-chevron-left"></i> 使用PLCrashReporter
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/05/20161005代码优化之宏定义-macros/" rel="prev" title="代码优化之宏定义 - macros">
+                代码优化之宏定义 - macros <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTMzNy81OTA1"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">wangdetong</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#遇到的问题"><span class="nav-number">1.</span> <span class="nav-text">遇到的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-msg-blk-is-not-a-function-In-‘blk-0-“”-documentName-’-‘blk’-is-false"><span class="nav-number">1.1.</span> <span class="nav-text">1. msg: blk is not a function. (In ‘blk(0, “”, documentName)’, ‘blk’ is false),</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-TypeError-cb-apply-is-not-a-function？"><span class="nav-number">1.2.</span> <span class="nav-text">2. TypeError: cb.apply is not a function？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-NSMutableArray的sortUsingComparator-失效"><span class="nav-number">1.3.</span> <span class="nav-text">3. NSMutableArray的sortUsingComparator 失效</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基础"><span class="nav-number">2.</span> <span class="nav-text">基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-for循环相关"><span class="nav-number">2.1.</span> <span class="nav-text">1. for循环相关</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-NSArray-注意"><span class="nav-number">2.2.</span> <span class="nav-text">2. NSArray 注意</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-hidden"><span class="nav-number">2.3.</span> <span class="nav-text">3. hidden?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Struct"><span class="nav-number">2.4.</span> <span class="nav-text">4. Struct</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-get懒加载"><span class="nav-number">2.5.</span> <span class="nav-text">5. get懒加载</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调试"><span class="nav-number">3.</span> <span class="nav-text">调试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSPatch-Convertor-’s-不足："><span class="nav-number">4.</span> <span class="nav-text">JSPatch Convertor ’s 不足：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应该注意"><span class="nav-number">5.</span> <span class="nav-text">应该注意</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangdetong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -79,13 +79,17 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="iKiwi">
-<meta property="og:url" content="http://yoursite.com/archives/index.html">
+<meta name="description" content="背景：经常听到 主队列+同步=死锁  后来看到第三方库有这段代码:dispatch_sync(dispatch_get_main_queue(), ^{ })感觉纳闷了，不是死锁了，怎么还用它？ 查了资料：如果这段code 在主队列上执行会造成死锁，而在子队列上执行不会造成死锁。  用途：当前在子线程处理数据后，需要在主线程同步刷新UI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="主队列＋同步==死锁?">
+<meta property="og:url" content="http://yoursite.com/2016/02/10/20160210主队列＋同步-死锁/index.html">
 <meta property="og:site_name" content="iKiwi">
+<meta property="og:description" content="背景：经常听到 主队列+同步=死锁  后来看到第三方库有这段代码:dispatch_sync(dispatch_get_main_queue(), ^{ })感觉纳闷了，不是死锁了，怎么还用它？ 查了资料：如果这段code 在主队列上执行会造成死锁，而在子队列上执行不会造成死锁。  用途：当前在子线程处理数据后，需要在主线程同步刷新UI">
 <meta property="og:locale" content="zh-cn">
+<meta property="og:updated_time" content="2019-06-22T03:32:12.348Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iKiwi">
+<meta name="twitter:title" content="主队列＋同步==死锁?">
+<meta name="twitter:description" content="背景：经常听到 主队列+同步=死锁  后来看到第三方库有这段代码:dispatch_sync(dispatch_get_main_queue(), ^{ })感觉纳闷了，不是死锁了，怎么还用它？ 查了资料：如果这段code 在主队列上执行会造成死锁，而在子队列上执行不会造成死锁。  用途：当前在子线程处理数据后，需要在主线程同步刷新UI">
 
 
 
@@ -115,13 +119,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/archives/">
+  <link rel="canonical" href="http://yoursite.com/2016/02/10/20160210主队列＋同步-死锁/">
 
 
 
 
 
-  <title>Archive | iKiwi</title>
+  <title>主队列＋同步==死锁? | iKiwi</title>
   
 
 
@@ -140,7 +144,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -234,395 +238,179 @@
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
 
-      <span class="archive-page-counter">
-        
-        
-         
-        
-        OK! 32 posts in total. Keep on posting.
-      </span>
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/02/10/20160210主队列＋同步-死锁/">
 
-      
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
 
         
         
+          <h1 class="post-title" itemprop="name headline">主队列＋同步==死锁?</h1>
         
 
-        
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-02-10T00:00:00+08:00">
+                2016-02-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
           
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2018">2018</h1>
-          </div>
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/12/20/20181220app启动优化/" itemprop="url">
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
               
-                <span itemprop="name">app启动优化</span>
+                <span class="post-meta-item-text">In</span>
               
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-12-20T22:53:42+08:00" content="2018-12-20">
-          12-20
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/09/02/20180902前端渲染-服务端渲染/" itemprop="url">
               
-                <span itemprop="name">前端渲染&服务端渲染</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
               
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-09-02T22:37:47+08:00" content="2018-09-02">
-          09-02
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/08/08/20180808初识JS引擎-渲染引擎/" itemprop="url">
-              
-                <span itemprop="name">初识JS引擎&渲染引擎</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-08-08T22:13:37+08:00" content="2018-08-08">
-          08-08
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/01/11/20180111初窥小程序/" itemprop="url">
-              
-                <span itemprop="name">初窥小程序</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-01-11T23:00:10+08:00" content="2018-01-11">
-          01-11
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
+            </span>
           
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2017">2017</h1>
-          </div>
-        
-        
 
-        
+          
+            
+          
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+          
+          
 
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/09/11/20170911从-dyld-到-runtime/" itemprop="url">
-              
-                <span itemprop="name">从 dyld 到 runtime</span>
-              
-            </a>
-        
-      </h2>
+          
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2017-09-11T00:00:00+08:00" content="2017-09-11">
-          09-11
-        </time>
-      </div>
+          
 
-    </header>
-  </article>
+          
 
+        </div>
+      </header>
+    
 
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/08/25/20170825app瘦身之移除无用macho文件/" itemprop="url">
-              
-                <span itemprop="name">app瘦身之移除无用macho文件</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2017-08-25T00:00:00+08:00" content="2017-08-25">
-          08-25
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
       
 
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/07/12/20170712线程安全之gcd/" itemprop="url">
-              
-                <span itemprop="name">线程安全之gcd</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2017-07-12T00:00:00+08:00" content="2017-07-12">
-          07-12
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
       
+        <blockquote>
+<p>背景：经常听到 主队列+同步=死锁</p>
+</blockquote>
+<p>后来看到第三方库有这段代码:<br><code>dispatch_sync(dispatch_get_main_queue(), ^{ })</code>感觉纳闷了，不是死锁了，怎么还用它？</p>
+<p>查了资料：如果这段code 在主队列上执行会造成死锁，而在子队列上执行不会造成死锁。</p>
+<blockquote>
+<p>用途：当前在子线程处理数据后，需要在主线程同步刷新UI</p>
+</blockquote>
+<a id="more"></a>
 
-        
-        
-        
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#define dispatch_main_sync_safe(block)\</span></span><br><span class="line">    <span class="keyword">if</span> ([<span class="built_in">NSThread</span> isMainThread]) &#123;\</span><br><span class="line">        block();\</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;\</span><br><span class="line">        <span class="built_in">dispatch_sync</span>(dispatch_get_main_queue(), block);\</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/06/11/20170611线程安全之锁/" itemprop="url">
-              
-                <span itemprop="name">线程安全之锁</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2017-06-11T00:00:00+08:00" content="2017-06-11">
-          06-11
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
+<p>在SDWebImage中看到</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (image &amp;&amp; options &amp; SDWebImageRefreshCached) &#123;</span><br><span class="line">	dispatch_main_sync_safe(^&#123;</span><br><span class="line">	<span class="comment">// If image was found in the cache but SDWebImageRefreshCached is provided, notify about the cached image</span></span><br><span class="line">	<span class="comment">// AND try to re-download it in order to let a chance to NSURLCache to refresh it from server.</span></span><br><span class="line">	completedBlock(image, <span class="literal">nil</span>, cacheType, <span class="literal">YES</span>, url);</span><br><span class="line">	&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/05/08/20170508聊一聊YYCache/" itemprop="url">
-              
-                <span itemprop="name">聊一聊YYCache</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2017-05-08T00:00:00+08:00" content="2017-05-08">
-          05-08
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2017/04/02/20170402AppleScript让iMessage更好玩/" itemprop="url">
-              
-                <span itemprop="name">AppleScript让iMessage更好玩</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2017-04-02T00:00:00+08:00" content="2017-04-02">
-          04-02
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
     </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/01/03/20160103聊一聊NSNotification/" rel="next" title="聊一聊NSNotification">
+                <i class="fa fa-chevron-left"></i> 聊一聊NSNotification
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/02/19/20160219异步-多线程？/" rel="prev" title="异步==多线程？">
+                异步==多线程？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
-
-  
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/archives/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/archives/page/4/">4</a><a class="extend next" rel="next" href="/archives/page/2/"><i class="fa fa-angle-right"></i></a>
-  </nav>
+  </article>
 
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -630,6 +418,15 @@
 
 
           
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTMzNy81OTA1"></div>
+    </div>
+
+  
+
+
 
         </div>
         
@@ -835,6 +632,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
@@ -863,6 +664,17 @@
 
 
 
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
   
 
 

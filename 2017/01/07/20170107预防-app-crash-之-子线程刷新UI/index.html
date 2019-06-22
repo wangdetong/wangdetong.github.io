@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-cn">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="为什么不能在子线程刷新UI，以及如何预防在子线程刷新UI？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="预防 app crash 之 子线程刷新UI">
+<meta property="og:url" content="http://yoursite.com/2017/01/07/20170107预防-app-crash-之-子线程刷新UI/index.html">
+<meta property="og:site_name" content="iKiwi">
+<meta property="og:description" content="为什么不能在子线程刷新UI，以及如何预防在子线程刷新UI？">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="http://yoursite.com/2017/01/07/20170107预防-app-crash-之-子线程刷新UI/20170107%E9%A2%84%E9%98%B2-app-crash-%E4%B9%8B-%E5%AD%90%E7%BA%BF%E7%A8%8B%E5%88%B7%E6%96%B0UI/a.gif">
+<meta property="og:updated_time" content="2019-06-22T03:32:12.392Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="预防 app crash 之 子线程刷新UI">
+<meta name="twitter:description" content="为什么不能在子线程刷新UI，以及如何预防在子线程刷新UI？">
+<meta name="twitter:image" content="http://yoursite.com/2017/01/07/20170107预防-app-crash-之-子线程刷新UI/20170107%E9%A2%84%E9%98%B2-app-crash-%E4%B9%8B-%E5%AD%90%E7%BA%BF%E7%A8%8B%E5%88%B7%E6%96%B0UI/a.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/01/07/20170107预防-app-crash-之-子线程刷新UI/">
+
+
+
+
+
+  <title>预防 app crash 之 子线程刷新UI | iKiwi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">iKiwi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/07/20170107预防-app-crash-之-子线程刷新UI/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">预防 app crash 之 子线程刷新UI</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-07T00:00:00+08:00">
+                2017-01-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>为什么不能在子线程刷新UI，以及如何预防在子线程刷新UI？</p>
+<a id="more"></a>
+
+<h2 id="why-update-UI-on-main-thread"><a href="#why-update-UI-on-main-thread" class="headerlink" title="why update UI on main thread"></a>why update UI on main thread</h2><p>在网上查了一下资料,总结一下:<br>由于UIKit框架是线程不安全的，如果确保线程安全需要考虑的东西很多，代价太大，所有苹果官方建议在 main thread 上更新UI。</p>
+<p>apple关于update UI on main thread的说明如下：<a href="https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/Multithreading/AboutThreads/AboutThreads.html" target="_blank" rel="noopener">developer.apple.com</a></p>
+<blockquote>
+<p>Threads and Your User Interface<br>If your application has a graphical user interface, it is recommended that you receive user-related events and initiate interface updates from your application’s main thread. This approach helps avoid synchronization issues associated with handling user events and drawing window content. Some frameworks, such as Cocoa, generally require this behavior, but even for those that do not, keeping this behavior on the main thread has the advantage of simplifying the logic for managing your user interface.</p>
+</blockquote>
+<p>There are a few notable exceptions where it is advantageous to perform graphical operations from other threads. For example, you can use secondary threads to create and process images and perform other image-related calculations. Using secondary threads for these operations can greatly increase performance. If you are not sure about a particular graphical operation though, plan on doing it from your main thread.</p>
+<p>For more information about Cocoa thread safety, see Thread Safety Summary. For more information about drawing in Cocoa, see Cocoa Drawing Guide.</p>
+<h2 id="在子线程更新UI后果"><a href="#在子线程更新UI后果" class="headerlink" title="在子线程更新UI后果"></a>在子线程更新UI后果</h2><p>在子线程进行UI操作有很大几率会导致程序崩溃，或者出现预期之外的UI显示效果…</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 崩溃</span><br><span class="line">（EXC_BAD_ACCESS(code=2,address=0xcc)，0x1a0ad32: movl 204(%ecx), %edx ）</span><br></pre></td></tr></table></figure>
+
+<h2 id="如果在子线程更新UI，系统会怎样处理"><a href="#如果在子线程更新UI，系统会怎样处理" class="headerlink" title="如果在子线程更新UI，系统会怎样处理"></a>如果在子线程更新UI，系统会怎样处理</h2><p>乐观情况下：<br>在子线程更新UI，其更新UI的函数栈，会等到子线程结束后回到主线程时，主线程执行其函数栈，进而更新UI；如果子线程sleep(10), 10秒后其UI才会更新</p>
+<p>上代码:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    [<span class="keyword">self</span>.button setTitle:<span class="string">@"点我呀"</span> forState:<span class="built_in">UIControlStateNormal</span>];</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">IBAction</span>)touchButton:(<span class="keyword">id</span>)sender &#123;</span><br><span class="line">    [<span class="keyword">self</span>.button setTitleColor:[<span class="built_in">UIColor</span> redColor] forState:<span class="built_in">UIControlStateNormal</span>];</span><br><span class="line">    [<span class="built_in">NSThread</span> detachNewThreadSelector:<span class="keyword">@selector</span>(tapAction) toTarget:<span class="keyword">self</span> withObject:<span class="literal">nil</span>];</span><br><span class="line">&#125;</span><br><span class="line">-(<span class="keyword">void</span>)tapAction &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"currentThread:%@"</span>,[<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">    <span class="keyword">self</span>.view.backgroundColor = [<span class="built_in">UIColor</span> lightGrayColor];</span><br><span class="line">    [<span class="built_in">NSThread</span> sleepForTimeInterval:<span class="number">4.0</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="20170107%E9%A2%84%E9%98%B2-app-crash-%E4%B9%8B-%E5%AD%90%E7%BA%BF%E7%A8%8B%E5%88%B7%E6%96%B0UI/a.gif" alt="logo"></p>
+<h2 id="如何统一处理，避免在子线程刷新UI"><a href="#如何统一处理，避免在子线程刷新UI" class="headerlink" title="如何统一处理，避免在子线程刷新UI"></a>如何统一处理，避免在子线程刷新UI</h2><p>一个细心程序员会在main thread中刷新UI，而如果是疲劳编码😪，可能会忽略这个细节；也有可能在在接收别人的代码时，发现了这个问题，有没有办法消除这个顾虑呢？😖</p>
+<p>解：有！通过runtime的 swizzling来解决。当刷新UI时，一定会调用UILayer／UIView的那几个方法，只需要确保这几个方法是在main thread中执行的就行了</p>
+<blockquote>
+<p>在appdelegate中：</p>
+</blockquote>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">BOOL</span>)application:(<span class="built_in">UIApplication</span> *)application didFinishLaunchingWithOptions:(<span class="built_in">NSDictionary</span> *)launchOptions</span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//...</span></span><br><span class="line">    <span class="keyword">if</span>(!(TARGET_OS_SIMULATOR))&#123;</span><br><span class="line">        [<span class="built_in">UIView</span> wbg_swizzling_viewMethod];</span><br><span class="line">        [<span class="built_in">CALayer</span> wbg_swizzling_layerMethod];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//...</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在UIView+layout.m中</p>
+</blockquote>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"UIView+wbg_swizzling.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&lt;objc/runtime.h&gt;</span></span></span><br><span class="line"><span class="comment">// 在 主线程中执行</span></span><br><span class="line"><span class="meta">#define dispatch_main_async_safe(block)\</span></span><br><span class="line"><span class="keyword">if</span> ([<span class="built_in">NSThread</span> isMainThread]) &#123;\</span><br><span class="line">block();\</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;\</span><br><span class="line">CrashOnSimulator(<span class="string">@"⚠️没有在main中更新UI！！！"</span>);\</span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_main_queue(), block);\</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 定义在 主线程中执行的方法</span></span><br><span class="line"><span class="meta">#define wbg_funcPerformOnMain(methodName)\</span></span><br><span class="line">- (<span class="keyword">void</span>)methodName;\</span><br><span class="line">&#123;\</span><br><span class="line">__<span class="keyword">weak</span> <span class="keyword">typeof</span>(<span class="keyword">self</span>) weak_self = <span class="keyword">self</span>;\</span><br><span class="line">dispatch_main_async_safe(^()&#123;\</span><br><span class="line">[weak_self methodName];\</span><br><span class="line">&#125;);\</span><br><span class="line">&#125;\</span><br><span class="line"><span class="comment">// 定义在 主线程中执行的方法＋参数</span></span><br><span class="line"><span class="meta">#define wbg_funcPerformOnMainWithParamType(methodName,paramType)\</span></span><br><span class="line">- (<span class="keyword">void</span>)methodName:(paramType)param;\</span><br><span class="line">&#123;\</span><br><span class="line">__<span class="keyword">weak</span> <span class="keyword">typeof</span>(<span class="keyword">self</span>) weak_self = <span class="keyword">self</span>;\</span><br><span class="line">dispatch_main_async_safe(^()&#123;\</span><br><span class="line">[weak_self methodName:param];\</span><br><span class="line">&#125;);\</span><br><span class="line">&#125;\</span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">NSObject</span> (<span class="title">wbg_swizzling</span>)</span></span><br><span class="line">+ (<span class="keyword">void</span>)wbg_swizzlingClass:(Class)clazz orginalMethod:(SEL)orginalMethodSelector customMethod:(SEL)customMethodSelector&#123;</span><br><span class="line">    Method systemMethod = class_getInstanceMethod([clazz <span class="keyword">class</span>], orginalMethodSelector);</span><br><span class="line">    Method swizzMethod = class_getInstanceMethod([clazz <span class="keyword">class</span>], customMethodSelector);</span><br><span class="line">    method_exchangeImplementations(systemMethod, swizzMethod);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">UIView</span> (<span class="title">wbg_swizzling</span>)</span></span><br><span class="line">+ (<span class="keyword">void</span>)wbg_swizzling_viewMethod&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> wbg_swizzling_token;</span><br><span class="line">    <span class="built_in">dispatch_once</span>(&amp;wbg_swizzling_token, ^&#123;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">/// hook UIView</span></span><br><span class="line">        [<span class="built_in">NSObject</span> wbg_swizzlingClass:[<span class="keyword">self</span> <span class="keyword">class</span>] orginalMethod:<span class="keyword">@selector</span>(setNeedsLayout) customMethod:<span class="keyword">@selector</span>(wbg_sf_view_setNeedsLayout)];</span><br><span class="line">        [<span class="built_in">NSObject</span> wbg_swizzlingClass:[<span class="keyword">self</span> <span class="keyword">class</span>] orginalMethod:<span class="keyword">@selector</span>(setNeedsDisplay) customMethod:<span class="keyword">@selector</span>(wbg_sf_view_setNeedsDisplay)];</span><br><span class="line">        [<span class="built_in">NSObject</span> wbg_swizzlingClass:[<span class="keyword">self</span> <span class="keyword">class</span>] orginalMethod:<span class="keyword">@selector</span>(setNeedsDisplayInRect) customMethod:<span class="keyword">@selector</span>(wbg_sf_view_setNeedsDisplayInRect:)];</span><br><span class="line">        </span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line">wbg_funcPerformOnMain(wbg_sf_view_setNeedsLayout)</span><br><span class="line">wbg_funcPerformOnMain(wbg_sf_view_setNeedsDisplay)</span><br><span class="line">wbg_funcPerformOnMainWithParamType(wbg_sf_view_setNeedsDisplayInRect, <span class="built_in">CGRect</span>)</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">CALayer</span> (<span class="title">wbg_swizzling</span>)</span></span><br><span class="line">+ (<span class="keyword">void</span>)wbg_swizzling_layerMethod&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> wbg_swizzling_token;</span><br><span class="line">    <span class="built_in">dispatch_once</span>(&amp;wbg_swizzling_token, ^&#123;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">/// hook Layer</span></span><br><span class="line">        [<span class="built_in">NSObject</span> wbg_swizzlingClass:[<span class="keyword">self</span> <span class="keyword">class</span>] orginalMethod:<span class="keyword">@selector</span>(setNeedsLayout) customMethod:<span class="keyword">@selector</span>(wbg_sf_layer_setNeedsLayout)];</span><br><span class="line">        [<span class="built_in">NSObject</span> wbg_swizzlingClass:[<span class="keyword">self</span> <span class="keyword">class</span>] orginalMethod:<span class="keyword">@selector</span>(setNeedsDisplay) customMethod:<span class="keyword">@selector</span>(wbg_sf_layer_setNeedsDisplay)];</span><br><span class="line">        [<span class="built_in">NSObject</span> wbg_swizzlingClass:[<span class="keyword">self</span> <span class="keyword">class</span>] orginalMethod:<span class="keyword">@selector</span>(setNeedsDisplayInRect) customMethod:<span class="keyword">@selector</span>(wbg_sf_layer_setNeedsDisplayInRect:)];</span><br><span class="line">        </span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line">wbg_funcPerformOnMain(wbg_sf_layer_setNeedsLayout)</span><br><span class="line">wbg_funcPerformOnMain(wbg_sf_layer_setNeedsDisplay)</span><br><span class="line">wbg_funcPerformOnMainWithParamType(wbg_sf_layer_setNeedsDisplayInRect, <span class="built_in">CGRect</span>)</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>感谢大神 <a href="https://zshowing.github.io/archives/" target="_blank" rel="noopener">张硕</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/28/20161128探究DZNEmptyDataSet源码-细节-扩展/" rel="next" title="探究DZNEmptyDataSet源码&细节&扩展">
+                <i class="fa fa-chevron-left"></i> 探究DZNEmptyDataSet源码&细节&扩展
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/17/20170217预防-app-crash-之-unrecognized-selector/" rel="prev" title="预防 app crash 之 unrecognized selector">
+                预防 app crash 之 unrecognized selector <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTMzNy81OTA1"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">wangdetong</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#why-update-UI-on-main-thread"><span class="nav-number">1.</span> <span class="nav-text">why update UI on main thread</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在子线程更新UI后果"><span class="nav-number">2.</span> <span class="nav-text">在子线程更新UI后果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如果在子线程更新UI，系统会怎样处理"><span class="nav-number">3.</span> <span class="nav-text">如果在子线程更新UI，系统会怎样处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何统一处理，避免在子线程刷新UI"><span class="nav-number">4.</span> <span class="nav-text">如何统一处理，避免在子线程刷新UI</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangdetong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

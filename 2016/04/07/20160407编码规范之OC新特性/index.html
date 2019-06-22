@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-cn">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="发现bug的时机越早越好：complier 优先于run，即编译报错优先于运行报错，那么我们该如何增加编译提示？下面的方式经常出现在优秀的第三方库中哟！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编码规范之OC新特性">
+<meta property="og:url" content="http://yoursite.com/2016/04/07/20160407编码规范之OC新特性/index.html">
+<meta property="og:site_name" content="iKiwi">
+<meta property="og:description" content="发现bug的时机越早越好：complier 优先于run，即编译报错优先于运行报错，那么我们该如何增加编译提示？下面的方式经常出现在优秀的第三方库中哟！">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="http://yoursite.com/2016/04/07/20160407编码规范之OC新特性/20160407%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83%E4%B9%8BOC%E6%96%B0%E7%89%B9%E6%80%A7/NS_DESIGNATED_INITIALIZER.png">
+<meta property="og:image" content="http://yoursite.com/2016/04/07/20160407编码规范之OC新特性/20160407%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83%E4%B9%8BOC%E6%96%B0%E7%89%B9%E6%80%A7/NS_UNAVAILABLE.png">
+<meta property="og:image" content="http://yoursite.com/2016/04/07/20160407编码规范之OC新特性/20160407%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83%E4%B9%8BOC%E6%96%B0%E7%89%B9%E6%80%A7/__kindof_array.png">
+<meta property="og:image" content="http://yoursite.com/2016/04/07/20160407编码规范之OC新特性/20160407%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83%E4%B9%8BOC%E6%96%B0%E7%89%B9%E6%80%A7/__kindof_init.png">
+<meta property="og:image" content="http://yoursite.com/2016/04/07/20160407编码规范之OC新特性/20160407%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83%E4%B9%8BOC%E6%96%B0%E7%89%B9%E6%80%A7/Nullability1.png">
+<meta property="og:image" content="http://yoursite.com/2016/04/07/20160407编码规范之OC新特性/20160407%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83%E4%B9%8BOC%E6%96%B0%E7%89%B9%E6%80%A7/Nullability2.png">
+<meta property="og:updated_time" content="2019-06-22T03:32:12.349Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="编码规范之OC新特性">
+<meta name="twitter:description" content="发现bug的时机越早越好：complier 优先于run，即编译报错优先于运行报错，那么我们该如何增加编译提示？下面的方式经常出现在优秀的第三方库中哟！">
+<meta name="twitter:image" content="http://yoursite.com/2016/04/07/20160407编码规范之OC新特性/20160407%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83%E4%B9%8BOC%E6%96%B0%E7%89%B9%E6%80%A7/NS_DESIGNATED_INITIALIZER.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/04/07/20160407编码规范之OC新特性/">
+
+
+
+
+
+  <title>编码规范之OC新特性 | iKiwi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">iKiwi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/04/07/20160407编码规范之OC新特性/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">编码规范之OC新特性</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-04-07T00:00:00+08:00">
+                2016-04-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>发现bug的时机越早越好：complier 优先于run，即编译报错优先于运行报错，那么我们该如何增加编译提示？<br>下面的方式经常出现在优秀的第三方库中哟！</p>
+<a id="more"></a>
+<h2 id="NS-DESIGNATED-INITIALIZER"><a href="#NS-DESIGNATED-INITIALIZER" class="headerlink" title="NS_DESIGNATED_INITIALIZER"></a>NS_DESIGNATED_INITIALIZER</h2><p>它用来指定初始化的方法。如果类中Other Initializer 必须要调用Designated Initializer，否则有warning。<br>还有，子类也必须调用父类的Designated Initializer</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">instancetype</span>)initWithName:(<span class="built_in">NSString</span> *)name;</span><br><span class="line">- (<span class="keyword">instancetype</span>)initWithAge:(<span class="built_in">NSString</span> *)age;</span><br><span class="line">- (<span class="keyword">instancetype</span>)initWithName:(<span class="built_in">NSString</span> *)name age:(<span class="built_in">NSInteger</span> )age <span class="built_in">NS_DESIGNATED_INITIALIZER</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="20160407%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83%E4%B9%8BOC%E6%96%B0%E7%89%B9%E6%80%A7/NS_DESIGNATED_INITIALIZER.png" alt="logo"><br>图片：logo</p>
+<h2 id="NS-UNAVAILABLE"><a href="#NS-UNAVAILABLE" class="headerlink" title="NS_UNAVAILABLE"></a>NS_UNAVAILABLE</h2><p>有的时候，咱们封装一个view，需要在初始化的时候进行一些配置。为了防止其他开发者使用错误，就不允许他们直接使用init or new，那么NS_UNAVAILABLE可以做到！</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">instancetype</span>)new UNAVAILABLE_ATTRIBUTE;</span><br><span class="line">+ (<span class="keyword">instancetype</span>)init __attribute__((unavailable(<span class="string">"init方法不可用，请用initWithName:"</span>)));</span><br><span class="line">- (<span class="keyword">instancetype</span>)initWithName:(<span class="built_in">NSString</span> *)name;</span><br></pre></td></tr></table></figure>
+
+<p><img src="20160407%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83%E4%B9%8BOC%E6%96%B0%E7%89%B9%E6%80%A7/NS_UNAVAILABLE.png" alt="logo"></p>
+<h2 id="kindof"><a href="#kindof" class="headerlink" title="__kindof"></a>__kindof</h2><p>判断某对象是否是某类型或其子类型，可以取消 父类转换为子类时的warning。</p>
+<p>数组<br><img src="20160407%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83%E4%B9%8BOC%E6%96%B0%E7%89%B9%E6%80%A7/__kindof_array.png" alt="logo"></p>
+<p>init方法</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">+ (<span class="keyword">instancetype</span>)person1;</span><br><span class="line">+ (__kindof <span class="keyword">instancetype</span>)person2;</span><br></pre></td></tr></table></figure>
+
+<p><img src="20160407%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83%E4%B9%8BOC%E6%96%B0%E7%89%B9%E6%80%A7/__kindof_init.png" alt="logo"></p>
+<h2 id="Nullability"><a href="#Nullability" class="headerlink" title="Nullability"></a>Nullability</h2><p>常用_nullable / nullable 、 __nonnull / nonnull 、 NS_ASSUME_NONNULL_BEGIN NS_ASSUME_NONNULL_END等来表示方法的返回值／参数 &amp; 类属性 是否可以为空。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)friendWithName:(<span class="keyword">nonnull</span> <span class="built_in">NSString</span> *)name &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="20160407%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83%E4%B9%8BOC%E6%96%B0%E7%89%B9%E6%80%A7/Nullability1.png" alt="logo"><br>如果，*.h中的所有属性都需要标注为nonnull 怎么办？有没有简单的方法？<br>有！NS_ASSUME_NONNULL_BEGIN …… NS_ASSUME_NONNULL_END 表明此此区间的类的header文件中，所有属性都不为nil，不在需要明确指定.如果有可以为nil，的可以自己标出来。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NS_ASSUME_NONNULL_BEGIN</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> : <span class="title">UIViewController</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSString</span> *name;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSString</span> *schoolName;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSString</span> *teacherName;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>, <span class="keyword">nullable</span>) <span class="built_in">NSString</span> *fatherName;<span class="comment">// 表示fatherName 可以为 nil</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="built_in">NS_ASSUME_NONNULL_END</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="20160407%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83%E4%B9%8BOC%E6%96%B0%E7%89%B9%E6%80%A7/Nullability2.png" alt="logo"></p>
+<h2 id="unused"><a href="#unused" class="headerlink" title="unused"></a>unused</h2><p>修饰在method的 imp中 不会使用的 param，使用unused可以让编译可以相应的进行优化。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这里使用unused的原因是为了提示编译器，此处可不分配内存，请注意，如果你在方法中使用了这个变量，不会报错，但是反而会给编译带来额外负担。</span></span><br><span class="line">- (<span class="keyword">instancetype</span>)copyWithZone:(<span class="built_in">NSZone</span> *__unused)zone</span><br></pre></td></tr></table></figure>
+
+<p><a href="http://www.starfelix.com/blog/2014/04/13/zheng-que-bian-xie-designated-initializerde-ji-ge-yuan-ze/" target="_blank" rel="noopener">正确编写Designated Initializer的几个原则</a></p>
+<p><a href="http://blog.sunnyxx.com/2015/06/12/objc-new-features-in-2015/" target="_blank" rel="noopener">2015 Objective-C 新特性</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/20/20160320关于延时操作一二/" rel="next" title="关于延时操作一二">
+                <i class="fa fa-chevron-left"></i> 关于延时操作一二
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/04/20/20160420weak-self-strong-self/" rel="prev" title="weak_self & strong_self">
+                weak_self & strong_self <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTMzNy81OTA1"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">wangdetong</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#NS-DESIGNATED-INITIALIZER"><span class="nav-number">1.</span> <span class="nav-text">NS_DESIGNATED_INITIALIZER</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NS-UNAVAILABLE"><span class="nav-number">2.</span> <span class="nav-text">NS_UNAVAILABLE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kindof"><span class="nav-number">3.</span> <span class="nav-text">__kindof</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nullability"><span class="nav-number">4.</span> <span class="nav-text">Nullability</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#unused"><span class="nav-number">5.</span> <span class="nav-text">unused</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangdetong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

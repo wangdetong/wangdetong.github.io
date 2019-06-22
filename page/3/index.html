@@ -81,7 +81,7 @@
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="iKiwi">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:url" content="http://yoursite.com/page/3/index.html">
 <meta property="og:site_name" content="iKiwi">
 <meta property="og:locale" content="zh-cn">
 <meta name="twitter:card" content="summary">
@@ -115,7 +115,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/">
+  <link rel="canonical" href="http://yoursite.com/page/3/">
 
 
 
@@ -249,7 +249,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/20/20181220app启动优化/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/06/21/20160621mac连接ios设备的方式/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="wangdetong">
@@ -268,7 +268,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/12/20/20181220app启动优化/" itemprop="url">app启动优化</a></h1>
+                <a class="post-title-link" href="/2016/06/21/20160621mac连接ios设备的方式/" itemprop="url">mac连接ios设备的方式</a></h1>
         
 
         <div class="post-meta">
@@ -280,8 +280,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-20T22:53:42+08:00">
-                2018-12-20
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-06-21T00:00:00+08:00">
+                2016-06-21
               </time>
             
 
@@ -341,10 +341,10 @@
 
       
         
-          <p>app启动优化属于一个老生常谈的话题，其优化思路早已耳濡目染。</p>
+          <p>介绍一下在越狱时，如何调试的？</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/12/20/20181220app启动优化/#more" rel="contents">
+            <a class="btn" href="/2016/06/21/20160621mac连接ios设备的方式/#more" rel="contents">
               Read more &raquo;
             </a>
           </div>
@@ -395,7 +395,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/02/20180902前端渲染-服务端渲染/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/05/22/20160522正确理解atomic/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="wangdetong">
@@ -414,7 +414,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/09/02/20180902前端渲染-服务端渲染/" itemprop="url">前端渲染&服务端渲染</a></h1>
+                <a class="post-title-link" href="/2016/05/22/20160522正确理解atomic/" itemprop="url">正确理解atomic</a></h1>
         
 
         <div class="post-meta">
@@ -426,8 +426,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-09-02T22:37:47+08:00">
-                2018-09-02
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-05-22T00:00:00+08:00">
+                2016-05-22
               </time>
             
 
@@ -449,8 +449,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/全栈/" itemprop="url" rel="index">
-                    <span itemprop="name">全栈</span>
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
                   </a>
                 </span>
 
@@ -487,10 +487,13 @@
 
       
         
-          <p>貌似几年之前从服务端生成html(如servlet)慢慢开始前后端分离，把一些渲染计算的步骤抛向前端来减轻服务端的压力。但是为啥现在又开始流行在服务端渲染html了呢</p>
+          <h1 id="正确理解关于-atomic-的线程安全"><a href="#正确理解关于-atomic-的线程安全" class="headerlink" title="正确理解关于 atomic 的线程安全"></a>正确理解关于 atomic 的线程安全</h1><blockquote>
+<p>设置property为atomic只能说明该属性是原子访问的，不能说明是多线程安全的</p>
+</blockquote>
+<p>atomic保证对它的getter/setter是线程安全的,但不保证拿到这个对象后进行操作是线程安全的。<br>例如@property(atomic,strong)NSMutableArray *arr;<br>atomic 能保证调用self.arr / self.arr = xxx;是线程安全，而不能保证调用[self.arr addObject:xx]也是线程安全。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/09/02/20180902前端渲染-服务端渲染/#more" rel="contents">
+            <a class="btn" href="/2016/05/22/20160522正确理解atomic/#more" rel="contents">
               Read more &raquo;
             </a>
           </div>
@@ -541,7 +544,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/08/20180808初识JS引擎-渲染引擎/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/05/08/20160508浅谈isa-metaclass/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="wangdetong">
@@ -560,7 +563,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/08/08/20180808初识JS引擎-渲染引擎/" itemprop="url">初识JS引擎&渲染引擎</a></h1>
+                <a class="post-title-link" href="/2016/05/08/20160508浅谈isa-metaclass/" itemprop="url">浅谈isa & metaclass</a></h1>
         
 
         <div class="post-meta">
@@ -572,8 +575,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-08-08T22:13:37+08:00">
-                2018-08-08
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-05-08T00:00:00+08:00">
+                2016-05-08
               </time>
             
 
@@ -595,8 +598,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/前端/" itemprop="url" rel="index">
-                    <span itemprop="name">前端</span>
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
                   </a>
                 </span>
 
@@ -633,10 +636,10 @@
 
       
         
-          <p>浏览器中含有JS引擎、渲染引擎，它们分别是什么？</p>
+          <p><img src="20160508%E6%B5%85%E8%B0%88isa-metaclass/isa.png" alt="logo"></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/08/08/20180808初识JS引擎-渲染引擎/#more" rel="contents">
+            <a class="btn" href="/2016/05/08/20160508浅谈isa-metaclass/#more" rel="contents">
               Read more &raquo;
             </a>
           </div>
@@ -687,7 +690,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/11/20180111初窥小程序/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/05/07/20160507collection-deep-shallow-copy/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="wangdetong">
@@ -706,7 +709,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/01/11/20180111初窥小程序/" itemprop="url">初窥小程序</a></h1>
+                <a class="post-title-link" href="/2016/05/07/20160507collection-deep-shallow-copy/" itemprop="url">collection deep/shallow copy</a></h1>
         
 
         <div class="post-meta">
@@ -718,8 +721,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-11T23:00:10+08:00">
-                2018-01-11
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-05-07T00:00:00+08:00">
+                2016-05-07
               </time>
             
 
@@ -741,8 +744,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/前端/" itemprop="url" rel="index">
-                    <span itemprop="name">前端</span>
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
                   </a>
                 </span>
 
@@ -779,16 +782,305 @@
 
       
         
-          <p>Q：微信小程序的用户体验和native差不多，难道其原理和RN的跨平台技术类似？<br>A：不，小程序是一种Hybrid方案，与常规的Hybrid方案（基于WebView的H5应用，也可通过JSBridge使用native组件）不同的是:</p>
+          <p>如何快速的对collection进行 深copy？</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/05/07/20160507collection-deep-shallow-copy/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/04/22/20160422编码规范之传递时间的类型/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/04/22/20160422编码规范之传递时间的类型/" itemprop="url">编码规范之传递时间的类型</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-04-22T00:00:00+08:00">
+                2016-04-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>在模块之间通讯时，如何规范的传递时间？</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/04/22/20160422编码规范之传递时间的类型/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/04/21/20160421编码规范之-associated-key/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/04/21/20160421编码规范之-associated-key/" itemprop="url">编码规范之 associated_key</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-04-21T00:00:00+08:00">
+                2016-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>看过一些第三方库的源码发现，objc_setAssociatedObject的key的有多钟方式，列举如下:</p>
 <blockquote>
-<ol>
-<li>自定义一套DSL</li>
-<li>JS 运行环境与浏览器分离，运行在单独的 JS 引擎上</li>
-</ol>
+<p>我最喜欢“使用默认值”的那种方式，写法简洁！</p>
 </blockquote>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2018/01/11/20180111初窥小程序/#more" rel="contents">
+            <a class="btn" href="/2016/04/21/20160421编码规范之-associated-key/#more" rel="contents">
               Read more &raquo;
             </a>
           </div>
@@ -839,7 +1131,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/11/20170911从-dyld-到-runtime/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/04/20/20160420weak-self-strong-self/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="wangdetong">
@@ -858,7 +1150,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/09/11/20170911从-dyld-到-runtime/" itemprop="url">从 dyld 到 runtime</a></h1>
+                <a class="post-title-link" href="/2016/04/20/20160420weak-self-strong-self/" itemprop="url">weak_self & strong_self</a></h1>
         
 
         <div class="post-meta">
@@ -870,8 +1162,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-11T00:00:00+08:00">
-                2017-09-11
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-04-20T00:00:00+08:00">
+                2016-04-20
               </time>
             
 
@@ -931,10 +1223,10 @@
 
       
         
-          <p>最近在看《程序员的自我修养》，学到了一些关于编译、linker、dyld等知识，当浏览一些大神的关于dyld的blog时，加上一些open source上源码，有了自己的理解，记录一下。</p>
+          <p>大家都知道使用在block里面使用weak_self是为了避免循环引用的，比如：__weak typeof(self) weak_self = self;，<br>在读AFN源码时不但有weakSelf 还存在 strongSelf，那strongSelf是干啥的？</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/09/11/20170911从-dyld-到-runtime/#more" rel="contents">
+            <a class="btn" href="/2016/04/20/20160420weak-self-strong-self/#more" rel="contents">
               Read more &raquo;
             </a>
           </div>
@@ -985,7 +1277,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/04/07/20160407编码规范之OC新特性/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="wangdetong">
@@ -1004,7 +1296,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/08/25/20170825app瘦身之移除无用macho文件/" itemprop="url">app瘦身之移除无用macho文件</a></h1>
+                <a class="post-title-link" href="/2016/04/07/20160407编码规范之OC新特性/" itemprop="url">编码规范之OC新特性</a></h1>
         
 
         <div class="post-meta">
@@ -1016,8 +1308,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-25T00:00:00+08:00">
-                2017-08-25
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-04-07T00:00:00+08:00">
+                2016-04-07
               </time>
             
 
@@ -1077,11 +1369,10 @@
 
       
         
-          <p>最近一直在弄app瘦身的相关工作，除了常规的瘦身方案外，今天看了另外一种思路：<a href="https://mp.weixin.qq.com/s?__biz=MzA4MjA0MTc4NQ==&mid=504089563&idx=1&sn=9328409758177cb6df3edbb3b8a0c161#rd" target="_blank" rel="noopener">移除无用的mach-o文件</a>。
-我就尝试用python脚本实现它<a href="https://github.com/wangdetong/app_thin_for_framework" target="_blank" rel="noopener">python脚本的地址</a></p>
+          <p>发现bug的时机越早越好：complier 优先于run，即编译报错优先于运行报错，那么我们该如何增加编译提示？<br>下面的方式经常出现在优秀的第三方库中哟！</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/08/25/20170825app瘦身之移除无用macho文件/#more" rel="contents">
+            <a class="btn" href="/2016/04/07/20160407编码规范之OC新特性/#more" rel="contents">
               Read more &raquo;
             </a>
           </div>
@@ -1132,7 +1423,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/12/20170712线程安全之gcd/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/03/20/20160320关于延时操作一二/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="wangdetong">
@@ -1151,7 +1442,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/07/12/20170712线程安全之gcd/" itemprop="url">线程安全之gcd</a></h1>
+                <a class="post-title-link" href="/2016/03/20/20160320关于延时操作一二/" itemprop="url">关于延时操作一二</a></h1>
         
 
         <div class="post-meta">
@@ -1163,8 +1454,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-12T00:00:00+08:00">
-                2017-07-12
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-03-20T00:00:00+08:00">
+                2016-03-20
               </time>
             
 
@@ -1224,17 +1515,21 @@
 
       
         
-          <p>多线程的数据安全除了锁能解决，还可以通过gcd的一些方法来解决：比如 异步串行队列、信号量、dispatch_barrier_async、dispatch_group_t…现在可以通过源码+例子 来了解一下它们。当然，还有一个学习gcd的一个好的方法就是看一下 TMCache的源码。</p>
+          <p>三种延时方式</p>
+<ul>
+<li>dispatch_after</li>
+<li>NSTimer</li>
+<li>performSelector:withObject:afterDelay
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/07/12/20170712线程安全之gcd/#more" rel="contents">
+            <a class="btn" href="/2016/03/20/20160320关于延时操作一二/#more" rel="contents">
               Read more &raquo;
             </a>
           </div>
           <!--/noindex-->
         
       
-    </div>
+    </li></ul></div>
     
     
     
@@ -1278,7 +1573,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/11/20170611线程安全之锁/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/02/19/20160219异步-多线程？/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="wangdetong">
@@ -1297,7 +1592,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/06/11/20170611线程安全之锁/" itemprop="url">线程安全之锁</a></h1>
+                <a class="post-title-link" href="/2016/02/19/20160219异步-多线程？/" itemprop="url">异步==多线程？</a></h1>
         
 
         <div class="post-meta">
@@ -1309,8 +1604,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-11T00:00:00+08:00">
-                2017-06-11
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-02-19T00:00:00+08:00">
+                2016-02-19
               </time>
             
 
@@ -1370,302 +1665,10 @@
 
       
         
-          <p>为了提高CPU的的使用率，出现了多线程，然而多线程影响了数据的安全，为了保护多线程下的数据安全，出现了锁的概念。现在给大家介绍一下我了解的锁…</p>
+          <p>一定要异步到子线程吗？</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/06/11/20170611线程安全之锁/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/08/20170508聊一聊YYCache/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="wangdetong">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="iKiwi">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/05/08/20170508聊一聊YYCache/" itemprop="url">聊一聊YYCache</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-08T00:00:00+08:00">
-                2017-05-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>最近拜读了一下YYCache的源码，发现ibireme大神对内存优化的独特风格值得学习。查了一些网上的资源，找到一些比较有用的信息，在这里说一说…</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/05/08/20170508聊一聊YYCache/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/02/20170402AppleScript让iMessage更好玩/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="wangdetong">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="iKiwi">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/04/02/20170402AppleScript让iMessage更好玩/" itemprop="url">AppleScript让iMessage更好玩</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-02T00:00:00+08:00">
-                2017-04-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Mac/" itemprop="url" rel="index">
-                    <span itemprop="name">Mac</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>之前写了一篇关于《让我的iPhone变成Mac的遥控器》的文章，自己一顿乱想，想做一个具有自动回复的机器人，这篇就开始做了…</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/04/02/20170402AppleScript让iMessage更好玩/#more" rel="contents">
+            <a class="btn" href="/2016/02/19/20160219异步-多线程？/#more" rel="contents">
               Read more &raquo;
             </a>
           </div>
@@ -1707,7 +1710,7 @@
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 

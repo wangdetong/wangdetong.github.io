@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-cn">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Q：微信小程序的用户体验和native差不多，难道其原理和RN的跨平台技术类似？A：不，小程序是一种Hybrid方案，与常规的Hybrid方案（基于WebView的H5应用，也可通过JSBridge使用native组件）不同的是:   自定义一套DSL JS 运行环境与浏览器分离，运行在单独的 JS 引擎上">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初窥小程序">
+<meta property="og:url" content="http://yoursite.com/2018/01/11/20180111初窥小程序/index.html">
+<meta property="og:site_name" content="iKiwi">
+<meta property="og:description" content="Q：微信小程序的用户体验和native差不多，难道其原理和RN的跨平台技术类似？A：不，小程序是一种Hybrid方案，与常规的Hybrid方案（基于WebView的H5应用，也可通过JSBridge使用native组件）不同的是:   自定义一套DSL JS 运行环境与浏览器分离，运行在单独的 JS 引擎上">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="http://yoursite.com/2018/01/11/20180111初窥小程序/20180111%E5%88%9D%E7%AA%A5%E5%B0%8F%E7%A8%8B%E5%BA%8F/a.png">
+<meta property="og:updated_time" content="2019-06-22T03:32:12.635Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="初窥小程序">
+<meta name="twitter:description" content="Q：微信小程序的用户体验和native差不多，难道其原理和RN的跨平台技术类似？A：不，小程序是一种Hybrid方案，与常规的Hybrid方案（基于WebView的H5应用，也可通过JSBridge使用native组件）不同的是:   自定义一套DSL JS 运行环境与浏览器分离，运行在单独的 JS 引擎上">
+<meta name="twitter:image" content="http://yoursite.com/2018/01/11/20180111初窥小程序/20180111%E5%88%9D%E7%AA%A5%E5%B0%8F%E7%A8%8B%E5%BA%8F/a.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/01/11/20180111初窥小程序/">
+
+
+
+
+
+  <title>初窥小程序 | iKiwi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">iKiwi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/11/20180111初窥小程序/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">初窥小程序</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-11T23:00:10+08:00">
+                2018-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Q：微信小程序的用户体验和native差不多，难道其原理和RN的跨平台技术类似？<br>A：不，小程序是一种Hybrid方案，与常规的Hybrid方案（基于WebView的H5应用，也可通过JSBridge使用native组件）不同的是:</p>
+<blockquote>
+<ol>
+<li>自定义一套DSL</li>
+<li>JS 运行环境与浏览器分离，运行在单独的 JS 引擎上</li>
+</ol>
+</blockquote>
+<a id="more"></a>
+
+<p>为什么微信不使用常规的Hybrid方案？</p>
+<blockquote>
+<p>2015年初，微信推出了JS-SDK，开放了几十个有关拍照、地图等等非常有用的API。也就是采用了常规的Hybrid方案，微信提供webview容器，业务方写h5</p>
+</blockquote>
+<h1 id="小程序特点"><a href="#小程序特点" class="headerlink" title="小程序特点"></a>小程序特点</h1><p>实际上这种常规的Hybrid方案不能满足重要的需求：<br>“管控”：如果H5应用出现黄赌毒，那么微信平台是需要担负责任的。H5应用又是很灵活的，平台无法做到监管。</p>
+<h2 id="管控"><a href="#管控" class="headerlink" title="管控"></a>管控</h2><p>在管控方面做两件事：自定义一套DSL和分离JS运行环境</p>
+<h3 id="DSL"><a href="#DSL" class="headerlink" title="DSL"></a>DSL</h3><p>为了限制H5的灵活，微信让业务方开发者按照自己的一套DSL来编写业务，并通过一系列工具把框架中的wxml/wxss/js转成 html/css/js并渲染到webview上，这样微信可以通过业务审核/代码扫描/域名扫描等一系列措施来进行监管。</p>
+<blockquote>
+<p>自定义一套DSL另外的好处：DSL 最终转成什么，最终如何执行渲染都由框架决定，上层不感知，可以做成由 webview 渲染，以后微信有条件了也可以用类似RN的方案实现渲染层。</p>
+</blockquote>
+<h3 id="JS环境"><a href="#JS环境" class="headerlink" title="JS环境"></a>JS环境</h3><p>Q：小程序跑在WebView上，开发者可以通过JS来操纵DOM，在上线后可以规避上线时微信的管控。怎样能限制应用的 JS 调用 dom 的权限？<br>A：应用的JS 运行环境与浏览器分离，运行在单独的 JS 引擎上。这样应用的JS无法获得DOM，而微信框架核心的JS依然运行在webview上，可以操纵DOM。</p>
+<blockquote>
+<p>扩展：由于JS 与页面渲染分离，那么他们可以并行执行，不会出现 JS 执行时卡住页面渲染的情况，提升渲染性能。</p>
+</blockquote>
+<h2 id="小程序运行环境"><a href="#小程序运行环境" class="headerlink" title="小程序运行环境"></a>小程序运行环境</h2><table>
+<thead>
+<tr>
+<th>运行环境</th>
+<th>逻辑层(JS引擎)</th>
+<th>渲染层</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>iOS</td>
+<td>JavaScriptCore</td>
+<td>WKWebView</td>
+</tr>
+<tr>
+<td>Android</td>
+<td>X5 JSCore</td>
+<td>X5浏览器</td>
+</tr>
+<tr>
+<td>小程序开发工具</td>
+<td>NWJS(node-webkit，为chrome内核)</td>
+<td>Chrome WebView</td>
+</tr>
+</tbody></table>
+<p>当我们对 view 层进行事件操作后，会通过 WeixinJSBridge 将数据传递到 Native 系统层。Native 系统层决定是否要用 native 处理，然后丢给 逻辑层进行用户的逻辑代码处理。逻辑层处理完毕后会将数据通过 WeixinJSBridge 返给 View 层。View 渲染更新视图。<br><img src="20180111%E5%88%9D%E7%AA%A5%E5%B0%8F%E7%A8%8B%E5%BA%8F/a.png" alt="logo"></p>
+<p>参考：<br><a href="https://blog.cnbang.net/tech/3486/" target="_blank" rel="noopener">小程序技术方案探讨</a><br><a href="http://eux.baidu.com/blog/fe/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%9E%B6%E6%9E%84%E5%8E%9F%E7%90%86" target="_blank" rel="noopener">小程序大致原理</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/11/20170911从-dyld-到-runtime/" rel="next" title="从 dyld 到 runtime">
+                <i class="fa fa-chevron-left"></i> 从 dyld 到 runtime
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/08/20180808初识JS引擎-渲染引擎/" rel="prev" title="初识JS引擎&渲染引擎">
+                初识JS引擎&渲染引擎 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTMzNy81OTA1"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">wangdetong</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#小程序特点"><span class="nav-number">1.</span> <span class="nav-text">小程序特点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#管控"><span class="nav-number">1.1.</span> <span class="nav-text">管控</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DSL"><span class="nav-number">1.1.1.</span> <span class="nav-text">DSL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JS环境"><span class="nav-number">1.1.2.</span> <span class="nav-text">JS环境</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小程序运行环境"><span class="nav-number">1.2.</span> <span class="nav-text">小程序运行环境</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangdetong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

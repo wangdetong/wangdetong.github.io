@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-cn">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="之前对Mach 异常、Unix 信号 和NSException 异常有些模糊， 最近看了一些文章，把自己想明白的东西写出来，当然有不对的地方可以指出来。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mach异常">
+<meta property="og:url" content="http://yoursite.com/2016/07/20/20160720Mach异常/index.html">
+<meta property="og:site_name" content="iKiwi">
+<meta property="og:description" content="之前对Mach 异常、Unix 信号 和NSException 异常有些模糊， 最近看了一些文章，把自己想明白的东西写出来，当然有不对的地方可以指出来。">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="http://yoursite.com/2016/07/20/20160720Mach异常/20160720Mach%E5%BC%82%E5%B8%B8/mach.png">
+<meta property="og:image" content="http://yoursite.com/2016/07/20/20160720Mach异常/20160720Mach%E5%BC%82%E5%B8%B8/mach2.png">
+<meta property="og:updated_time" content="2019-06-22T03:32:12.362Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mach异常">
+<meta name="twitter:description" content="之前对Mach 异常、Unix 信号 和NSException 异常有些模糊， 最近看了一些文章，把自己想明白的东西写出来，当然有不对的地方可以指出来。">
+<meta name="twitter:image" content="http://yoursite.com/2016/07/20/20160720Mach异常/20160720Mach%E5%BC%82%E5%B8%B8/mach.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/07/20/20160720Mach异常/">
+
+
+
+
+
+  <title>Mach异常 | iKiwi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">iKiwi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/20/20160720Mach异常/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Mach异常</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-20T00:00:00+08:00">
+                2016-07-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>之前对Mach 异常、Unix 信号 和NSException 异常有些模糊， 最近看了一些文章，把自己想明白的东西写出来，当然有不对的地方可以指出来。</p>
+<a id="more"></a>
+
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>Mach 异常是指最底层的内核级异常。用户态的开发者可以直接通过Mach API设置thread，task，host的异常端口，来捕获Mach异常。<br>Unix 信号又称BSD 信号，如果开发者没有捕获Mach异常，则会被host层的方法ux_exception()将异常转换为对应的UNIX信号，并通过方法threadsignal()将信号投递到出错线程。可以通过方法signal(x, SignalHandler)来捕获single。<br>NSException:应用级异常，开发者通过try catch来捕获NSException，或者通过NSSetUncaughtExceptionHandler()来处理一下crash前的事情。</p>
+<h2 id="异常关系"><a href="#异常关系" class="headerlink" title="异常关系"></a>异常关系</h2><p>我们通过上面的我们知道 未被捕获的Mach异常会被转化Unix信号，而NSException会怎么样？</p>
+<p>因为硬件产生的信号(通过CPU陷阱)被Mach层捕获，然后才转换为对应的Unix信号；苹果为了统一机制，于是操作系统和用户产生的信号(通过调用kill和pthread_kill)也首先沉下来被转换为Mach异常，再转换为Unix信号。</p>
+<p><a href="https://www.cocoawithlove.com/2010/05/handling-unhandled-exceptions-and.html" target="_blank" rel="noopener">handling-unhandled-exceptions</a></p>
+<blockquote>
+<p>EXC_BAD_ACCESS is a Mach exception sent by the kernel to your application when you try to access memory that is not mapped for your application. If not handled at the Mach level, it will be translated into a SIGBUS or SIGSEGV BSD signal.<br>SIGABRT is a BSD signal sent by an application to itself when an NSException or obj_exception_throw is not caught.</p>
+</blockquote>
+<p>也就是说未被try catch的NSException会发出kill或pthread_kill信号-&gt; Mach异常-&gt; Unix信号（SIGABRT）。</p>
+<h2 id="之前自己有个理解错误的地方："><a href="#之前自己有个理解错误的地方：" class="headerlink" title="之前自己有个理解错误的地方："></a>之前自己有个理解错误的地方：</h2><h3 id="正解"><a href="#正解" class="headerlink" title="正解"></a>正解</h3><p>错误的理解： 未NSSetUncaughtExceptionHandler的NSException最后会转成Unix信号，而设置了NSSetUncaughtExceptionHandler的就不会!</p>
+<p>正解是：无论设置了NSSetUncaughtExceptionHandler与否，最终都会被转成Unix信号，只要该NSException没有被try catch。<br>区别在于设置了，则在其ExceptionHandler中无法获得最终发送的Unix信号类型</p>
+<h3 id="demo"><a href="#demo" class="headerlink" title="demo"></a>demo</h3><ol>
+<li>测试一：在app启动的时候拦截signal()和NSSetUncaughtExceptionHandler，把项目编译到真机上。此时分别点击两个button，会弹出响应的异常提示。(都会crash)</li>
+<li>测试二：如果把NSSetUncaughtExceptionHandler注释掉后编译到真机上，点击关于NSException的button，会提示signal的相关信息。(都会crash)</li>
+<li>结果：对比下，发现设置了NSSetUncaughtExceptionHandler后，在其handler中，无法获得Unix信号。还有，通过Xcode查看两次的crash log都有Unix信号（SIGABRT）<h2 id="转化关系"><a href="#转化关系" class="headerlink" title="转化关系"></a>转化关系</h2></li>
+</ol>
+<h3 id="MachException2Unix"><a href="#MachException2Unix" class="headerlink" title="MachException2Unix"></a>MachException2Unix</h3><p><img src="20160720Mach%E5%BC%82%E5%B8%B8/mach.png" alt="logo"></p>
+<h3 id="NSException2Unix"><a href="#NSException2Unix" class="headerlink" title="NSException2Unix"></a>NSException2Unix</h3><p>记得上面说过：</p>
+<blockquote>
+<p>SIGABRT is a BSD signal sent by an application to itself when an NSException or obj_exception_throw is not caught.</p>
+</blockquote>
+<p>但是，这并不能代表SIGABRT就是 NSException导致，因为SIGABRT是调用abort()生成的信号</p>
+<h3 id="如何判断crash的原因是Mach异常还是NSException"><a href="#如何判断crash的原因是Mach异常还是NSException" class="headerlink" title="如何判断crash的原因是Mach异常还是NSException"></a>如何判断crash的原因是Mach异常还是NSException</h3><p>若程序因NSException而Crash，系统日志中的Last Exception Backtrace信息是完整准确的。<br>NSException没有 被try catch它转化为Unix信号是SIGABRT</p>
+<h3 id="常用的Unix信号"><a href="#常用的Unix信号" class="headerlink" title="常用的Unix信号"></a>常用的Unix信号</h3><ol>
+<li><p>SIGSEGV:试图访问未分配给自己的内存, 或试图往没有写权限的内存地址写数据。比如：给已经release的对象发送消息</p>
+</li>
+<li><p>SIGBUS:非法地址, 包括内存地址对齐(alignment)出错。比如访问一个四个字长的整数, 但其地址不是4的倍数。比如：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> *s = <span class="string">"hello world"</span>;</span><br><span class="line">*s = <span class="string">'H'</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>SIGABRT是调用abort()生成的信号，有可能是NSException也有可能是Mach 异常</p>
+</li>
+</ol>
+<h3 id="总结一下"><a href="#总结一下" class="headerlink" title="总结一下"></a>总结一下</h3><p><img src="20160720Mach%E5%BC%82%E5%B8%B8/mach2.png" alt="logo"></p>
+<h2 id="捕获异常问题"><a href="#捕获异常问题" class="headerlink" title="捕获异常问题"></a>捕获异常问题</h2><ul>
+<li><p>捕获Mach异常或者Unix信号都可以抓到crash事件，这两种方式哪个更好呢？</p>
+<blockquote>
+<p>优选Mach异常，因为Mach异常处理会先于Unix信号处理发生，如果Mach异常的handler让程序exit了，那么Unix信号就永远不会到达这个进程了。</p>
+</blockquote>
+</li>
+<li><p>为什么 第三方库PLCrashReporter即使在优选捕获Mach异常的情况下，也放弃捕获Mach异常EXC_CRASH，而选择捕获与之对应的SIGABRT信号?</p>
+<blockquote>
+<p>We still need to use signal handlers to catch SIGABRT in-process. The kernel sends an EXC_CRASH mach exception to denote SIGABRT termination. In that case, catching the Mach exception in-process leads to process deadlock in an uninterruptable wait. Thus, we fall back on BSD signal handlers for SIGABRT, and do not register for EXC_CRASH.</p>
+</blockquote>
+</li>
+<li><p>既然未被try catch的NSException最终会转为Unix信号,为什么还需要 Set the uncaught exception handler</p>
+<blockquote>
+<p>NSException会有更多的信息，获取它的reason，name，callStackSymbols信息才能确定出问题的程序位置。</p>
+</blockquote>
+</li>
+</ul>
+<p>参考：<br><a href="https://nianxi.net/ios/ios-crash-reporter.html" target="_blank" rel="noopener">漫谈iOS Crash收集框架</a><br><a href="http://www.jianshu.com/p/725e7d69272c" target="_blank" rel="noopener">浅谈Mach Exceptions</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/06/21/20160621mac连接ios设备的方式/" rel="next" title="mac连接ios设备的方式">
+                <i class="fa fa-chevron-left"></i> mac连接ios设备的方式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/26/20160726使用PLCrashReporter/" rel="prev" title="使用PLCrashReporter">
+                使用PLCrashReporter <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTMzNy81OTA1"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">wangdetong</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异常关系"><span class="nav-number">2.</span> <span class="nav-text">异常关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#之前自己有个理解错误的地方："><span class="nav-number">3.</span> <span class="nav-text">之前自己有个理解错误的地方：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#正解"><span class="nav-number">3.1.</span> <span class="nav-text">正解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#demo"><span class="nav-number">3.2.</span> <span class="nav-text">demo</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#转化关系"><span class="nav-number">4.</span> <span class="nav-text">转化关系</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MachException2Unix"><span class="nav-number">4.1.</span> <span class="nav-text">MachException2Unix</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSException2Unix"><span class="nav-number">4.2.</span> <span class="nav-text">NSException2Unix</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何判断crash的原因是Mach异常还是NSException"><span class="nav-number">4.3.</span> <span class="nav-text">如何判断crash的原因是Mach异常还是NSException</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常用的Unix信号"><span class="nav-number">4.4.</span> <span class="nav-text">常用的Unix信号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结一下"><span class="nav-number">4.5.</span> <span class="nav-text">总结一下</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#捕获异常问题"><span class="nav-number">5.</span> <span class="nav-text">捕获异常问题</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangdetong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

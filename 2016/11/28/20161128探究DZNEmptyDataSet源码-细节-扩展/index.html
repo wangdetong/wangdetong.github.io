@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-cn">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文概要：1，DZNEmptyDataSet的原理介绍2，你用的swizzle用对了吗3，如何避免associatedObject时(ASSIGN)出现野指针4，对DZNEmptyDataSet进行扩展，统一app的空白页 其中的细节：1，__NSCFString 的对象在heap上，不在stack上2，防止一个 有用的object对象 被销毁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="探究DZNEmptyDataSet源码&amp;细节&amp;扩展">
+<meta property="og:url" content="http://yoursite.com/2016/11/28/20161128探究DZNEmptyDataSet源码-细节-扩展/index.html">
+<meta property="og:site_name" content="iKiwi">
+<meta property="og:description" content="本文概要：1，DZNEmptyDataSet的原理介绍2，你用的swizzle用对了吗3，如何避免associatedObject时(ASSIGN)出现野指针4，对DZNEmptyDataSet进行扩展，统一app的空白页 其中的细节：1，__NSCFString 的对象在heap上，不在stack上2，防止一个 有用的object对象 被销毁">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="http://yoursite.com/2016/11/28/20161128探究DZNEmptyDataSet源码-细节-扩展/20161128%E6%8E%A2%E7%A9%B6DZNEmptyDataSet%E6%BA%90%E7%A0%81-%E7%BB%86%E8%8A%82-%E6%89%A9%E5%B1%95/b.png">
+<meta property="og:image" content="http://yoursite.com/2016/11/28/20161128探究DZNEmptyDataSet源码-细节-扩展/20161128%E6%8E%A2%E7%A9%B6DZNEmptyDataSet%E6%BA%90%E7%A0%81-%E7%BB%86%E8%8A%82-%E6%89%A9%E5%B1%95/a.png">
+<meta property="og:updated_time" content="2019-06-22T03:32:12.380Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="探究DZNEmptyDataSet源码&amp;细节&amp;扩展">
+<meta name="twitter:description" content="本文概要：1，DZNEmptyDataSet的原理介绍2，你用的swizzle用对了吗3，如何避免associatedObject时(ASSIGN)出现野指针4，对DZNEmptyDataSet进行扩展，统一app的空白页 其中的细节：1，__NSCFString 的对象在heap上，不在stack上2，防止一个 有用的object对象 被销毁">
+<meta name="twitter:image" content="http://yoursite.com/2016/11/28/20161128探究DZNEmptyDataSet源码-细节-扩展/20161128%E6%8E%A2%E7%A9%B6DZNEmptyDataSet%E6%BA%90%E7%A0%81-%E7%BB%86%E8%8A%82-%E6%89%A9%E5%B1%95/b.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/11/28/20161128探究DZNEmptyDataSet源码-细节-扩展/">
+
+
+
+
+
+  <title>探究DZNEmptyDataSet源码&细节&扩展 | iKiwi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">iKiwi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/11/28/20161128探究DZNEmptyDataSet源码-细节-扩展/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">探究DZNEmptyDataSet源码&细节&扩展</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-28T00:00:00+08:00">
+                2016-11-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文概要：<br>1，DZNEmptyDataSet的原理介绍<br>2，你用的swizzle用对了吗<br>3，如何避免associatedObject时(ASSIGN)出现野指针<br>4，对DZNEmptyDataSet进行扩展，统一app的空白页</p>
+<p>其中的细节：<br>1，__NSCFString 的对象在heap上，不在stack上<br>2，防止一个 有用的object对象 被销毁</p>
+<a id="more"></a>
+
+<h2 id="为什么需要引入DZNEmptyDataSet"><a href="#为什么需要引入DZNEmptyDataSet" class="headerlink" title="为什么需要引入DZNEmptyDataSet"></a>为什么需要引入DZNEmptyDataSet</h2><p>遇到一个bug：emptyView与 tableview都展示了<br><img src="20161128%E6%8E%A2%E7%A9%B6DZNEmptyDataSet%E6%BA%90%E7%A0%81-%E7%BB%86%E8%8A%82-%E6%89%A9%E5%B1%95/b.png" alt="logo"><br>1，查看展示emptyView的逻辑，是否展示emptyView的位置：网络请求/DB数据返回… 有的时候在同一个class中存在多个网络请求，在每个网络请求都加上了这种逻辑，不免让新来的同事看着发晕了，这才有可能造成上面的view bug</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="keyword">self</span>.items.count) &#123;</span><br><span class="line">	[<span class="keyword">self</span> showEmptyContentWithImage:[<span class="built_in">UIImage</span> imageNamed:<span class="string">@"commonEmpty"</span>] tip:<span class="string">@"暂无数据"</span>]; <span class="comment">// 实现逻辑：给当前vc.view addSubview emtpyView</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">	[<span class="keyword">self</span> hideEmptyTips]; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2，全局搜了一下showEmptyContentWithImage，发现这种方式特别多！</p>
+<p>【需求】期望在一个VC中添加一次 emptyView，到底显示与否由它的datasource来确定，在reload<br>Data()自己判断 self.items.count，而不是我们自己在上层判断（因为展示emptyView是个固定的判断模式，不依赖我们上层的其他数据！！！）</p>
+<h2 id="DZNEmptyDataSet简介"><a href="#DZNEmptyDataSet简介" class="headerlink" title="DZNEmptyDataSet简介"></a>DZNEmptyDataSet简介</h2><p>DZNEmptyDataSet专门为UITableView、UICollectionView提供空白页面的第三方库。<br>👇用UITableView来举例子</p>
+<p>简单使用：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Protocol Conformance</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">MainViewController</span> : <span class="title">UITableViewController</span> &lt;<span class="title">DZNEmptyDataSetSource</span>, <span class="title">DZNEmptyDataSetDelegate</span>&gt;</span></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad&#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    <span class="keyword">self</span>.tableView.emptyDataSetSource = <span class="keyword">self</span>;<span class="comment">// swizzle交换 reloadData()与 dzn_reloadEmptyDataSet()</span></span><br><span class="line">    <span class="keyword">self</span>.tableView.emptyDataSetDelegate = <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 提供 Data Source &amp; Delegate Implementation:控制view显示数据、点击事件...</span></span><br><span class="line">在合适的时候 [<span class="keyword">self</span>.tableView reloadData];<span class="comment">// 通过swizzle也就是调用dzn_reloadEmptyDataSet()</span></span><br></pre></td></tr></table></figure>
+
+<p>简单介绍：<br>通过associatedObject给tableview关联的属性有：<br>空白页：emptyDataSetView（subviews的布局）<br>数据源：emptyDataSetSource（显示的内容）<br>代理：emptyDataSetDelegate（手势、滚动…）</p>
+<p>重点是dzn_reloadEmptyDataSet的实现：<br>首先判断是非需要显示空白页:if ([self dzn_itemsCount] == 0){…}.<br>显示空白页：根据 emptyDataSetSource &amp; emptyDataSetDelegate 提供的内容来布局 emptyDataSetView空白页</p>
+<h3 id="emptyDataSetView"><a href="#emptyDataSetView" class="headerlink" title="emptyDataSetView"></a>emptyDataSetView</h3><p>通过associatedObject给tableView关联一个emptyDataSetView</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- (DZNEmptyDataSetView *)emptyDataSetView&#123;</span><br><span class="line">    DZNEmptyDataSetView *view = objc_getAssociatedObject(<span class="keyword">self</span>, kEmptyDataSetView);</span><br><span class="line">    <span class="keyword">if</span> (!view)&#123;</span><br><span class="line">        view = [DZNEmptyDataSetView new];</span><br><span class="line">		 ...</span><br><span class="line">        [<span class="keyword">self</span> setEmptyDataSetView:view];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> view;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="emptyDataSetSource-amp-emptyDataSetDelegate"><a href="#emptyDataSetSource-amp-emptyDataSetDelegate" class="headerlink" title="emptyDataSetSource &amp; emptyDataSetDelegate"></a>emptyDataSetSource &amp; emptyDataSetDelegate</h3><p>通过 associatedObject方式让tableView关联delegate&amp;dataSource(其中使用了container 而不是直接 关联delegate，后面会介绍原因)<br>swizzle 方法reloadData()与dzn_reloadEmptyDataSet()</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)setEmptyDataSetSource:(<span class="keyword">id</span>&lt;DZNEmptyDataSetSource&gt;)datasource&#123;</span><br><span class="line">	...</span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, kEmptyDataSetSource, [[DZNWeakObjectContainer alloc] initWithWeakObject:datasource], OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">    [<span class="keyword">self</span> swizzleIfPossible:<span class="keyword">@selector</span>(reloadData)];</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)setEmptyDataSetDelegate:(<span class="keyword">id</span>&lt;DZNEmptyDataSetDelegate&gt;)delegate&#123;</span><br><span class="line">	...</span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, kEmptyDataSetDelegate, [[DZNWeakObjectContainer alloc] initWithWeakObject:delegate], OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="swizzleIfPossible"><a href="#swizzleIfPossible" class="headerlink" title="swizzleIfPossible"></a>swizzleIfPossible</h3><p>swizzle的方式选择了method_setImplementation 其中 使用了C的指针（为什么不用method_exchangeImplementations 后面有介绍）<br>_impLookupTable用来记录已经swizzle过的方法与C的指针<br>当再次执行swizzleIfPossible的时候，判断是否已经swizzle过了，保证只swizzle一次。<br>C的pointer指向 original reloadData方法，会在dzn_original_implementation中使用。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)swizzleIfPossible:(SEL)selector&#123;</span><br><span class="line">    ....</span><br><span class="line">    Method method = class_getInstanceMethod(baseClass, selector);</span><br><span class="line">    IMP dzn_newImplementation = method_setImplementation(method, (IMP)dzn_original_implementation);</span><br><span class="line">    <span class="built_in">NSDictionary</span> *swizzledInfo = @&#123;DZNSwizzleInfoOwnerKey: baseClass,</span><br><span class="line">                                   DZNSwizzleInfoSelectorKey: <span class="built_in">NSStringFromSelector</span>(selector),</span><br><span class="line">                                   DZNSwizzleInfoPointerKey: [<span class="built_in">NSValue</span> valueWithPointer:dzn_newImplementation]&#125;;</span><br><span class="line">    [_impLookupTable setObject:swizzledInfo forKey:key];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="dzn-original-implementation"><a href="#dzn-original-implementation" class="headerlink" title="dzn_original_implementation"></a>dzn_original_implementation</h3><p>将tableview的reloadData替换的实现都做了什么？<br>从_impLookupTable中得到impPointer ，其指向original的 reload方法<br>执行[self dzn_reloadEmptyDataSet]来布局emptyDataSetView，然后执行 original的 reload方法</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> dzn_original_implementation(<span class="keyword">id</span> <span class="keyword">self</span>, SEL _cmd)&#123;</span><br><span class="line">    <span class="comment">// Fetch original implementation from lookup table</span></span><br><span class="line">    Class baseClass = dzn_baseClassToSwizzleForTarget(<span class="keyword">self</span>);</span><br><span class="line">    <span class="built_in">NSString</span> *key = dzn_implementationKey(baseClass, _cmd);</span><br><span class="line">    <span class="built_in">NSDictionary</span> *swizzleInfo = [_impLookupTable objectForKey:key];</span><br><span class="line">    <span class="built_in">NSValue</span> *impValue = [swizzleInfo valueForKey:DZNSwizzleInfoPointerKey];</span><br><span class="line">    IMP impPointer = [impValue pointerValue];</span><br><span class="line">    <span class="comment">// We then inject the additional implementation for reloading the empty dataset</span></span><br><span class="line">    <span class="comment">// Doing it before calling the original implementation does update the 'isEmptyDataSetVisible' flag on time.</span></span><br><span class="line">    [<span class="keyword">self</span> dzn_reloadEmptyDataSet];</span><br><span class="line">    <span class="comment">// If found, call original implementation</span></span><br><span class="line">    <span class="keyword">if</span> (impPointer) &#123;</span><br><span class="line">        ((<span class="keyword">void</span>(*)(<span class="keyword">id</span>,SEL))impPointer)(<span class="keyword">self</span>,_cmd);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="dzn-reloadEmptyDataSet"><a href="#dzn-reloadEmptyDataSet" class="headerlink" title="dzn_reloadEmptyDataSet"></a>dzn_reloadEmptyDataSet</h3><p>判断 当前的tableView的cell数量是不是为0?然后获得emptyDataSetView<br>如果delegate实现了自定义的 emptyView，则显示emptyView(在project中，可以通过这种方式来统一空白页的显示风格)<br>如果没有，则显示默认提供的emptyDataSetView，根据delegate &amp; dataSource提供的数据来布局emptyDataSetView</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)dzn_reloadEmptyDataSet&#123;</span><br><span class="line">	...</span><br><span class="line">    <span class="keyword">if</span> ([<span class="keyword">self</span> dzn_itemsCount] == <span class="number">0</span>))&#123;</span><br><span class="line">        DZNEmptyDataSetView *view = <span class="keyword">self</span>.emptyDataSetView;</span><br><span class="line">        ...</span><br><span class="line">        ...</span><br><span class="line">        <span class="built_in">UIView</span> *customView = [<span class="keyword">self</span> dzn_customView];        </span><br><span class="line">        <span class="keyword">if</span> (customView) &#123;<span class="comment">// 显示自定义emptyView</span></span><br><span class="line">            view.customView = customView;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;<span class="comment">// 显示默认提供的emptyDataSetView，根据delegate &amp; dataSource提供的数据来布局emptyDataSetView</span></span><br><span class="line">        ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="dzn-itemsCount"><a href="#dzn-itemsCount" class="headerlink" title="dzn_itemsCount"></a>dzn_itemsCount</h3><p>通过遍历的方式累计每个section的row的个数</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">NSInteger</span>)dzn_itemsCount&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// UITableView support</span></span><br><span class="line">    <span class="keyword">if</span> ([<span class="keyword">self</span> isKindOfClass:[<span class="built_in">UITableView</span> <span class="keyword">class</span>]]) &#123;</span><br><span class="line">        <span class="built_in">UITableView</span> *tableView = (<span class="built_in">UITableView</span> *)<span class="keyword">self</span>;</span><br><span class="line">        <span class="keyword">id</span> &lt;<span class="built_in">UITableViewDataSource</span>&gt; dataSource = tableView.dataSource;</span><br><span class="line">        <span class="built_in">NSInteger</span> sections = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (dataSource &amp;&amp; [dataSource respondsToSelector:<span class="keyword">@selector</span>(numberOfSectionsInTableView:)]) &#123;</span><br><span class="line">            sections = [dataSource numberOfSectionsInTableView:tableView];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (dataSource &amp;&amp; [dataSource respondsToSelector:<span class="keyword">@selector</span>(tableView:numberOfRowsInSection:)]) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="built_in">NSInteger</span> section = <span class="number">0</span>; section &lt; sections; section++) &#123;</span><br><span class="line">                items += [dataSource tableView:tableView numberOfRowsInSection:section];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// UICollectionView support</span></span><br><span class="line">	 ...</span><br><span class="line">    <span class="keyword">return</span> items;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="你的swizzle方式用对了吗？"><a href="#你的swizzle方式用对了吗？" class="headerlink" title="你的swizzle方式用对了吗？"></a>你的swizzle方式用对了吗？</h2><p>曾经一直使用 method_exchangeImplementations 来进行swizzle，后来发现这篇文章<a href="https://blog.newrelic.com/2014/04/16/right-way-to-swizzle/" target="_blank" rel="noopener">The Right Way to Swizzle in Objective-C</a>，感觉以后自己要注意了<br>相信身为程序员的你，看代码比看文字描述更能理解问题所在。</p>
+<h3 id="What-is-the-incorrect-way-to-swizzle："><a href="#What-is-the-incorrect-way-to-swizzle：" class="headerlink" title="What is the incorrect way to swizzle："></a>What is the incorrect way to swizzle：</h3><blockquote>
+<p>👇method_exchangeImplementations</p>
+</blockquote>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">IncorrectSwizzleClass</span> : <span class="title">NSObject</span></span></span><br><span class="line">- (<span class="keyword">void</span>) swizzleExample;</span><br><span class="line">- (<span class="keyword">void</span>) originalMethod;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">IncorrectSwizzleClass</span></span></span><br><span class="line">- (<span class="keyword">void</span>)swizzleExample&#123;</span><br><span class="line">    Method m1 = class_getInstanceMethod([<span class="keyword">self</span> <span class="keyword">class</span>], <span class="keyword">@selector</span>(originalMethod));</span><br><span class="line">    Method m2 = class_getInstanceMethod([<span class="keyword">self</span> <span class="keyword">class</span>], <span class="keyword">@selector</span>(replaceImp));</span><br><span class="line">    method_exchangeImplementations(m1, m2);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)originalMethod&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"originalMethod"</span>);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"string:%@"</span>,[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"*** -%@"</span>, <span class="built_in">NSStringFromSelector</span>(_cmd)]);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)replaceImp&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"replaceImp"</span>);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"string:%@"</span>,[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"*** -%@"</span>, <span class="built_in">NSStringFromSelector</span>(_cmd)]);</span><br><span class="line">    [<span class="keyword">self</span> replaceImp];<span class="comment">// 执行origin_Method，通过调用方法来实现，方法的第二个参数是 @“replace_imp”</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="The-correct-way-to-swizzle："><a href="#The-correct-way-to-swizzle：" class="headerlink" title="The correct way to swizzle："></a>The correct way to swizzle：</h3><blockquote>
+<p>👇method_setImplementation &amp; C指针</p>
+</blockquote>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">CorrectSwizzleClass</span> : <span class="title">NSObject</span></span></span><br><span class="line">- (<span class="keyword">void</span>) swizzleExample;</span><br><span class="line">- (<span class="keyword">void</span>) originalMethod;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="keyword">static</span> IMP __original_Method_Imp;</span><br><span class="line"><span class="keyword">void</span> replaceImp(<span class="keyword">id</span> <span class="keyword">self</span>, SEL _cmd)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"replaceImp"</span>);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"string:%@"</span>,[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"*** -%@"</span>, <span class="built_in">NSStringFromSelector</span>(_cmd)]);</span><br><span class="line">    ((<span class="keyword">int</span>(*)(<span class="keyword">id</span>,SEL))__original_Method_Imp)(<span class="keyword">self</span>, _cmd);<span class="comment">// 执行origin_Method，通过指针来调用方法，方法的第二个参数是 _cmd</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">CorrectSwizzleClass</span></span></span><br><span class="line">- (<span class="keyword">void</span>) swizzleExample&#123;</span><br><span class="line">    Method m = class_getInstanceMethod([<span class="keyword">self</span> <span class="keyword">class</span>],</span><br><span class="line">                                       <span class="keyword">@selector</span>(originalMethod));</span><br><span class="line">    __original_Method_Imp = method_setImplementation(m,</span><br><span class="line">                                                     (IMP)replaceImp);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>) originalMethod&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"originalMethod"</span>);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"string:%@"</span>,[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"*** -%@"</span>, <span class="built_in">NSStringFromSelector</span>(_cmd)]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>先打印结果</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"####################  correct   #######################"</span>);</span><br><span class="line">CorrectSwizzleClass* example = [[CorrectSwizzleClass alloc] init];</span><br><span class="line">[example originalMethod];</span><br><span class="line">[example swizzleExample];</span><br><span class="line">[example originalMethod];</span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"####################  incorrect   #######################"</span>);</span><br><span class="line">IncorrectSwizzleClass* example2 = [[IncorrectSwizzleClass alloc] init];</span><br><span class="line">[example2 originalMethod];</span><br><span class="line">[example2 swizzleExample];</span><br><span class="line">[example2 originalMethod];</span><br></pre></td></tr></table></figure>
+
+<p><img src="20161128%E6%8E%A2%E7%A9%B6DZNEmptyDataSet%E6%BA%90%E7%A0%81-%E7%BB%86%E8%8A%82-%E6%89%A9%E5%B1%95/a.png" alt="logo"></p>
+<p>看结果发现：</p>
+<ol>
+<li><p><code>[self replaceImp];</code>：通过调用OC的方法时，默认会传递两个参数<code>（self &amp; _cmd）</code>，方法的第二个参数是 <code>@“replace_imp”</code>，故打印的是<code>replaceImp</code><br><code>[self replaceImp]</code> 会被编译器变成 <code>objc_msgSend(self, @selector(replaceImp))</code></p>
+</li>
+<li><p><code>((int(*)(id,SEL))__original_Method_Imp)(self, _cmd)</code>;：通过指针来调用方法，去执行<code>origin_Method</code>，方法的第二个参数是<code>_cmd</code>，故打印的是<code>originalMethod</code></p>
+</li>
+<li><p>通过以上结果可以看出来：用pointer 可以正确的传递<code>_cmd</code></p>
+</li>
+</ol>
+<h2 id="associatedObject注意-ASSIGN"><a href="#associatedObject注意-ASSIGN" class="headerlink" title="associatedObject注意(ASSIGN)"></a>associatedObject注意(ASSIGN)</h2><h3 id="不小心可能出现野指针"><a href="#不小心可能出现野指针" class="headerlink" title="不小心可能出现野指针"></a>不小心可能出现野指针</h3><p>objc_setAssociatedObject(self, &amp;key, instance, OBJC_ASSOCIATION_ASSIGN)<br>如果使用OBJC_ASSOCIATION_ASSIGN时，应该注意 instance 是否已经被release了，如果被release了，再使用objc_getAssociatedObject(self, &amp;key)得到关联的对象时，会怎么样呢？</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="built_in">NSString</span> * <span class="keyword">const</span> kEmptyDataSetSource = <span class="string">@"emptyDataSetSource"</span>;</span><br><span class="line">- (<span class="keyword">void</span>)set_common_weak_object &#123;</span><br><span class="line">    <span class="built_in">NSArray</span> *arr = @[<span class="string">@"123"</span>,<span class="string">@"456"</span>];</span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, &amp;kEmptyDataSetSource, arr, OBJC_ASSOCIATION_ASSIGN);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)get_common_weak_object &#123;</span><br><span class="line">    <span class="keyword">id</span> result = objc_getAssociatedObject(<span class="keyword">self</span>,  &amp;kEmptyDataSetSource);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"result:%@"</span>,result);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    [<span class="keyword">self</span> set_common_weak_object];</span><br><span class="line">&#125;</span><br><span class="line">-(<span class="keyword">void</span>)viewWillAppear:(<span class="built_in">BOOL</span>)animated&#123;</span><br><span class="line">    [<span class="keyword">super</span> viewWillAppear:animated];</span><br><span class="line">    [<span class="keyword">self</span> get_common_weak_object];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>测试结果发现 会crash，因为出现了野指针</p>
+<h3 id="防止出现野指针"><a href="#防止出现野指针" class="headerlink" title="防止出现野指针"></a>防止出现野指针</h3><p>直接使用<code>OBJC_ASSOCIATION_RETAIN_NONATOMIC</code>就可以防止出现啊。的确可以，不过有点时候使用<code>delegate</code>时，需要防止循环引用而使用<code>OBJC_ASSOCIATION_ASSIGN</code>，故这里直接用<code>OBJC_ASSOCIATION_RETAIN_NONATOMIC</code>来代替是不合适的。<br>可以间接的解决循环引用的问题，即引入一个类，通过<code>objc_setAssociatedObject</code>对其<code>instance</code>进行<code>retain</code>，而需要关联的<code>object</code>在<code>instance</code>中是<code>weak</code>的。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">DZNWeakObjectContainer</span> : <span class="title">NSObject</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">readonly</span>, <span class="keyword">weak</span>) <span class="keyword">id</span> weakObject;</span><br><span class="line">- (<span class="keyword">instancetype</span>)initWithWeakObject:(<span class="keyword">id</span>)object;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"DZNWeakObjectContainer.h"</span></span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">DZNWeakObjectContainer</span></span></span><br><span class="line">- (<span class="keyword">instancetype</span>)initWithWeakObject:(<span class="keyword">id</span>)object&#123;</span><br><span class="line">    <span class="keyword">self</span> = [<span class="keyword">super</span> init];</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>) &#123;</span><br><span class="line">        _weakObject = object;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>来个例子👇</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// fixed delegate</span></span><br><span class="line">- (<span class="keyword">void</span>)set_common_weak_object_fixed &#123;</span><br><span class="line">    <span class="built_in">NSArray</span> *arr = @[<span class="string">@"123"</span>,<span class="string">@"456"</span>];</span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, &amp;kEmptyDataSetSource, [[DZNWeakObjectContainer alloc] initWithWeakObject:arr], OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)get_common_weak_object_fixed &#123;</span><br><span class="line">    DZNWeakObjectContainer *result = objc_getAssociatedObject(<span class="keyword">self</span>,  &amp;kEmptyDataSetSource);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"result:%@"</span>,result.weakObject);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    [<span class="keyword">self</span> set_common_weak_object_fixed];</span><br><span class="line">&#125;</span><br><span class="line">-(<span class="keyword">void</span>)viewWillAppear:(<span class="built_in">BOOL</span>)animated&#123;</span><br><span class="line">    [<span class="keyword">super</span> viewWillAppear:animated];</span><br><span class="line">    [<span class="keyword">self</span> get_common_weak_object_fixed];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="其实到这已经说完了，不过在测试时发现string的问题？"><a href="#其实到这已经说完了，不过在测试时发现string的问题？" class="headerlink" title="其实到这已经说完了，不过在测试时发现string的问题？"></a>其实到这已经说完了，不过在测试时发现string的问题？</h2><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)set_common_weak_string &#123;</span><br><span class="line"><span class="comment">//    NSString *name = @"hahaha"; // __NSCFConstanctString</span></span><br><span class="line"><span class="comment">//    NSString *name = [NSString stringWithFormat:@"hahaha"]; // NSTaggedPointerString</span></span><br><span class="line">    <span class="built_in">NSString</span> *name = [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"adasdadasdasdadasdasdadasdasdadasdasdadasdasdadasdasdadasdasdadasdasdadasdasdadasdasdadasdasd"</span>]; <span class="comment">// __NSCFString </span></span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, &amp;kEmptyDataSetSource, name, OBJC_ASSOCIATION_ASSIGN);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)get_common_weak_string &#123;</span><br><span class="line">    <span class="keyword">id</span> result = objc_getAssociatedObject(<span class="keyword">self</span>,  &amp;kEmptyDataSetSource);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"result:%@"</span>,result);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    [<span class="keyword">self</span> set_common_weak_string];</span><br><span class="line">&#125;</span><br><span class="line">-(<span class="keyword">void</span>)viewWillAppear:(<span class="built_in">BOOL</span>)animated&#123;</span><br><span class="line">    [<span class="keyword">super</span> viewWillAppear:animated];</span><br><span class="line">    [<span class="keyword">self</span> get_common_weak_string]; <span class="comment">// 没有crash？？？</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>上面已经 标注了 <strong>NSCFConstanctString &amp; NSTaggedPointerString &amp; __NSCFString ，本以为</strong>NSCFString 与 __NSCFArray是的情况一样的，都会 在objc_getAssociatedObject的时候出现野指针导致crash，而结果却没有。为啥？？？</p>
+</li>
+<li><p><a href="http://stackoverflow.com/questions/4326965/objective-c-memory-allocation-on-stack-vs-heap" target="_blank" rel="noopener">查资料stack-vs-heap</a>发现<code>__NSCFString</code> 是没有放到stack上的，而是放到heap上了，其release是有系统控制的，即我们在get的时候它还在，没有被release。</p>
+</li>
+</ol>
+<h2 id="对DZNEmptyDataSet进行扩展，统一app的空白页"><a href="#对DZNEmptyDataSet进行扩展，统一app的空白页" class="headerlink" title="对DZNEmptyDataSet进行扩展，统一app的空白页"></a>对DZNEmptyDataSet进行扩展，统一app的空白页</h2><p>有一天产品经理说，咱们的app中的空白页面风格太乱了，空白页显示的image大小不一，提示文字的大小颜色有的都不相同，需要咱们统一一下emptyView的风格。<br>1，以后UI统一提供24*24的image<br>2，程序员统一整个app的空白页的风格</p>
+<p>思路以及简单代码：</p>
+<p>(1)EmptyView 即统一的空白页，EmptyView 需要暴露出公共的属性，比如title、image…，这样每个模块都可以设置自己空白页的image、title…</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">EmptyView:<span class="built_in">UIView</span></span><br><span class="line">_title、_image、_description</span><br><span class="line">...<span class="comment">// layout view</span></span><br></pre></td></tr></table></figure>
+
+<p>(2)EmptyPage :控制EmptyView的显示title、image…这个控制器不一定是UIViewController,可以是个简单NSObject. ，它会retain这个EmptyView的instance(比如emptyView)。EmptyPage需要实现 的中的customViewForEmptyDataSet方法，并return self. emptyView。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">EmptyPage() &lt;DZNEmptyDataSetDelegate, DZNEmptyDataSetSource&gt;</span><br><span class="line">- (<span class="built_in">UIView</span> *)customViewForEmptyDataSet:(<span class="built_in">UIScrollView</span> *)scrollView&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">self</span>.emptyView;</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)setImage:(<span class="built_in">UIImage</span> *)image&#123;</span><br><span class="line">	<span class="keyword">self</span>.emptyView.image = image;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>(3)UIScrollView+Empty:对UIScrollView进行category添加一个方法，这样整个app的所有tableView 与 collectionView 都可以调用这个方法来设置空白页</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UIScrollView</span> + Empty</span><br><span class="line">- (<span class="keyword">void</span>)setupEmptyPageWithImage:(<span class="built_in">UIImage</span> *)image&#123;</span><br><span class="line">	EmptyPage *emptyPage = [EmptyPage new];</span><br><span class="line">	emptyPage.image = image;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 指定self.delegate 并swizzle self的reload()</span></span><br><span class="line">	<span class="keyword">self</span>.emptyDataSetSource   = emptyPage;</span><br><span class="line">   <span class="keyword">self</span>.emptyDataSetDelegate = emptyPage;</span><br><span class="line">   <span class="comment">// ⚠️ 避免 emptyPage dealloc ⚠️</span></span><br><span class="line">	objc_setAssociatedObject(<span class="keyword">self</span>, &amp;kEmptyPageAssociateObjectKey, emptyPage, OBJC_ASSOCIATION_RETAIN);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>(4)🌿⚠️❤️ 相关问题 😄🕛🍚</p>
+<p>Q：既然是swizzle tableview的reloadData，那么它应该是全局效果的，使用这种方式会不会导致我不想添加空白页的位置也展示了空白页？<br>A：不会的，如果你不设置需要展示空白页（[self.tableView setupEmptyPage];），那么当前的self.tableView.emptyDataSource = nil，而在DZNEmptyDataSet中做了判断，emptyDataSource=nil时不展示空白页！</p>
+<p>Q：为什么有的VC中刚进来先展示了空白页，再展示数据列表页？<br>A：原因是：刚进来这个VC时，执行了[tableView reloadData]。看看是不是自己主动调用了[tableView reloadData]，如果不是主动调用的，那就是系统在布局UI时调用了，比如：[tableView layoutSubviews] -&gt;[tableView reloadData]，由于系统调用layoutSubviews的时机有很多中情况，如果你不想一一排查，你可以延后设置空白的位置【不放在viewDidLoad中，而是放在网络请求结束后】</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/05/20161005代码优化之宏定义-macros/" rel="next" title="代码优化之宏定义 - macros">
+                <i class="fa fa-chevron-left"></i> 代码优化之宏定义 - macros
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/07/20170107预防-app-crash-之-子线程刷新UI/" rel="prev" title="预防 app crash 之 子线程刷新UI">
+                预防 app crash 之 子线程刷新UI <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTMzNy81OTA1"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">wangdetong</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么需要引入DZNEmptyDataSet"><span class="nav-number">1.</span> <span class="nav-text">为什么需要引入DZNEmptyDataSet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DZNEmptyDataSet简介"><span class="nav-number">2.</span> <span class="nav-text">DZNEmptyDataSet简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#emptyDataSetView"><span class="nav-number">2.1.</span> <span class="nav-text">emptyDataSetView</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#emptyDataSetSource-amp-emptyDataSetDelegate"><span class="nav-number">2.2.</span> <span class="nav-text">emptyDataSetSource &amp; emptyDataSetDelegate</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#swizzleIfPossible"><span class="nav-number">2.3.</span> <span class="nav-text">swizzleIfPossible</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dzn-original-implementation"><span class="nav-number">2.4.</span> <span class="nav-text">dzn_original_implementation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dzn-reloadEmptyDataSet"><span class="nav-number">2.5.</span> <span class="nav-text">dzn_reloadEmptyDataSet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dzn-itemsCount"><span class="nav-number">2.6.</span> <span class="nav-text">dzn_itemsCount</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#你的swizzle方式用对了吗？"><span class="nav-number">3.</span> <span class="nav-text">你的swizzle方式用对了吗？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#What-is-the-incorrect-way-to-swizzle："><span class="nav-number">3.1.</span> <span class="nav-text">What is the incorrect way to swizzle：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#The-correct-way-to-swizzle："><span class="nav-number">3.2.</span> <span class="nav-text">The correct way to swizzle：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分析"><span class="nav-number">3.3.</span> <span class="nav-text">分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#associatedObject注意-ASSIGN"><span class="nav-number">4.</span> <span class="nav-text">associatedObject注意(ASSIGN)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#不小心可能出现野指针"><span class="nav-number">4.1.</span> <span class="nav-text">不小心可能出现野指针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#防止出现野指针"><span class="nav-number">4.2.</span> <span class="nav-text">防止出现野指针</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其实到这已经说完了，不过在测试时发现string的问题？"><span class="nav-number">5.</span> <span class="nav-text">其实到这已经说完了，不过在测试时发现string的问题？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对DZNEmptyDataSet进行扩展，统一app的空白页"><span class="nav-number">6.</span> <span class="nav-text">对DZNEmptyDataSet进行扩展，统一app的空白页</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangdetong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

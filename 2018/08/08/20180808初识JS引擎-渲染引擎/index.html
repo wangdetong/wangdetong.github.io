@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-cn">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="浏览器中含有JS引擎、渲染引擎，它们分别是什么？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初识JS引擎&amp;渲染引擎">
+<meta property="og:url" content="http://yoursite.com/2018/08/08/20180808初识JS引擎-渲染引擎/index.html">
+<meta property="og:site_name" content="iKiwi">
+<meta property="og:description" content="浏览器中含有JS引擎、渲染引擎，它们分别是什么？">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="http://yoursite.com/2018/08/08/20180808初识JS引擎-渲染引擎/20180808%E5%88%9D%E8%AF%86JS%E5%BC%95%E6%93%8E-%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/d.png">
+<meta property="og:image" content="http://yoursite.com/2018/08/08/20180808初识JS引擎-渲染引擎/20180808%E5%88%9D%E8%AF%86JS%E5%BC%95%E6%93%8E-%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/a.png">
+<meta property="og:image" content="http://yoursite.com/2018/08/08/20180808初识JS引擎-渲染引擎/20180808%E5%88%9D%E8%AF%86JS%E5%BC%95%E6%93%8E-%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/b.png">
+<meta property="og:image" content="http://yoursite.com/2018/08/08/20180808初识JS引擎-渲染引擎/20180808%E5%88%9D%E8%AF%86JS%E5%BC%95%E6%93%8E-%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/c.png">
+<meta property="og:updated_time" content="2019-06-22T03:32:12.638Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="初识JS引擎&amp;渲染引擎">
+<meta name="twitter:description" content="浏览器中含有JS引擎、渲染引擎，它们分别是什么？">
+<meta name="twitter:image" content="http://yoursite.com/2018/08/08/20180808初识JS引擎-渲染引擎/20180808%E5%88%9D%E8%AF%86JS%E5%BC%95%E6%93%8E-%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/d.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/08/08/20180808初识JS引擎-渲染引擎/">
+
+
+
+
+
+  <title>初识JS引擎&渲染引擎 | iKiwi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">iKiwi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/08/08/20180808初识JS引擎-渲染引擎/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">初识JS引擎&渲染引擎</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-08-08T22:13:37+08:00">
+                2018-08-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>浏览器中含有JS引擎、渲染引擎，它们分别是什么？</p>
+<a id="more"></a>
+<h2 id="主流引擎"><a href="#主流引擎" class="headerlink" title="主流引擎"></a>主流引擎</h2><p><img src="20180808%E5%88%9D%E8%AF%86JS%E5%BC%95%E6%93%8E-%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/d.png" alt="logo"></p>
+<h2 id="浏览器的主要构成"><a href="#浏览器的主要构成" class="headerlink" title="浏览器的主要构成"></a>浏览器的主要构成</h2><ol>
+<li>用户界面 － 包括地址栏、后退/前进按钮、书签目录等，也就是你所看到的除了用来显示你所请求页面的主窗口之外的其他部分。</li>
+<li>浏览器引擎 － 用来查询及操作渲染引擎的接口。</li>
+<li><font color="#DC143C"> 渲染引擎(又称 浏览器内核) </font> － 用来显示请求的内容，例如，如果请求内容为html，它负责解析html及css，并将解析后的结果显示出来。</li>
+<li>网络 － 用来完成网络调用，例如http请求，它具有平台无关的接口，可以在不同平台上工作。</li>
+<li>UI后端 － 用来绘制类似组合选择框及对话框等基本组件，具有不特定于某个平台的通用接口，底层使用操作系统的用户接口。</li>
+<li><font color="#DC143C"> JS解释器 </font> － 用来解释执行JS代码。</li>
+<li>数据存储 － 属于持久层，浏览器需要在硬盘中保存类似cookie的各种数据，HTML5定义了web database技术，这是一种轻量级完整的客户端存储技术<br><img src="20180808%E5%88%9D%E8%AF%86JS%E5%BC%95%E6%93%8E-%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/a.png" alt="logo"><blockquote>
+<p>Chrome不同于大部分浏览器，Chrome为每个Tab分配了各自的渲染引擎实例，每个Tab就是一个独立的进程。</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="WebKit"><a href="#WebKit" class="headerlink" title="WebKit"></a>WebKit</h2><p>WebKit就是一个页面渲染以及逻辑处理引擎，前端工程师把HTML、JavaScript、CSS这“三驾马车”作为输入，经过WebKit的处理，就输出成了我们能看到以及操作的Web页面。<br><img src="20180808%E5%88%9D%E8%AF%86JS%E5%BC%95%E6%93%8E-%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/b.png" alt="logo"></p>
+<h3 id="WebKit-Embedding-API"><a href="#WebKit-Embedding-API" class="headerlink" title="WebKit Embedding API"></a>WebKit Embedding API</h3><p>负责浏览器UI与WebKit进行交互的部分</p>
+<h3 id="WebKit-Ports"><a href="#WebKit-Ports" class="headerlink" title="WebKit Ports"></a>WebKit Ports</h3><p>让Webkit更加方便的移植到各个操作系统、平台上，提供的一些调用Native Library的接口，比如在渲染层面，在iOS系统中，Safari是交给CoreGraphics处理，而在Android系统中，Webkit则是交给Skia。</p>
+<h3 id="WebCore"><a href="#WebCore" class="headerlink" title="WebCore"></a>WebCore</h3><p>在上面的WebKit组成图中，我们可以发现只有WebCore是红色的。这是因为时至今日，WebKit已经有很多的分支以及各大厂家也进行了很多优化改造，唯独WebCore这个部分是所有WebKit共享的。WebCore是WebKit中代码最多的部分，也是整个WebKit中最核心的渲染引擎。那首先我们来看看整个WebKit的渲染流程：<br><img src="20180808%E5%88%9D%E8%AF%86JS%E5%BC%95%E6%93%8E-%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/c.png" alt="logo"><br>首先浏览器通过URL定位到了一堆由HTML、CSS、JS组成的资源文件，通过加载器（这个加载器的实现也很复杂，在此不多赘述）把资源文件给WebCore。之后HTML Parser会把HTML解析成DOM树，CSS Parser会把CSS解析成CSSOM树。最后把这两棵树合并，生成最终需要的渲染树，再经过布局，与具体WebKit Ports的渲染接口，把渲染树渲染输出到屏幕上，成为了最终呈现在用户面前的Web页面。</p>
+<h3 id="JavaScriptCore"><a href="#JavaScriptCore" class="headerlink" title="JavaScriptCore"></a>JavaScriptCore</h3><p>JSCore是WebKit默认内嵌的JS引擎，之所以说是默认内嵌，是因为很多基于WebKit分支开发的浏览器引擎都开发了自家的JS引擎，其中最出名的就是Chrome的V8。这些JS引擎的使命都相同，那就是解释执行JS脚本。而从上面的渲染流程图我们可以看到，JS和DOM树之间存在着互相关联，这是因为浏览器中的JS脚本最主要的功能就是操作DOM树，并与之交互</p>
+<h2 id="渲染引擎"><a href="#渲染引擎" class="headerlink" title="渲染引擎"></a>渲染引擎</h2><p>渲染引擎的职责就是渲染，即在浏览器窗口中显示所请求的内容,如html、xml文档及图片等。<br>最开始渲染引擎和js引擎并没有区分的很明确，后来JS引擎越来越独立，内核就倾向于只指渲染引擎</p>
+<p>主流渲染引擎：</p>
+<blockquote>
+<p>WebKit：由KHTML发展而来，也是苹果给开源世界的一大贡献。<br>应用的浏览器有：Chrome（v27及之前版本）、Apple Safari、Symbian手机浏览器、Android 默认浏览器</p>
+</blockquote>
+<blockquote>
+<p>Blink：是一个由Google和Opera Software开发的浏览器排版引擎<br>应用的浏览器有：Chrome（v28及往后版本）、Opera（15及往后版本）</p>
+</blockquote>
+<blockquote>
+<p>Trident：<br>应用的浏览器有：微软的IE，IE4+ 的内核，一直持续到 IE11；EdgeH是微软抛弃 IE 后开发的全新内核</p>
+</blockquote>
+<blockquote>
+<p>Gecko：<br>应用的浏览器有：Firefox</p>
+</blockquote>
+<p>Blink &amp; WebKit &amp; Chromium关系：</p>
+<blockquote>
+<ol>
+<li>Chromium：一个建立在WebKit之上的浏览器开源项目，由Google发起的。该项目被创建以来发展迅速，很多先进的技术被采用，如跨进程模型，沙箱模型等等。同时，很多新的规范被支持，例如WebGL，Canvas2D，CSS3以及其他很多的HTML5特性，基本上每天你都可以看到它的变化，它的版本升级很快。在性能方面，其也备受称赞，包括快速启动，网页加载迅速等。</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="2">
+<li>后来Google退出WebKit项目，创建自己的渲染引擎Blink。Blink起初是从WebKit直接复制出一个版本出来，然后将与chromium无关的Ports全部移除掉，将代码结构重新整理</li>
+</ol>
+</blockquote>
+<h2 id="JavaScript引擎"><a href="#JavaScript引擎" class="headerlink" title="JavaScript引擎"></a>JavaScript引擎</h2><p>JavaScript引擎的作用</p>
+<blockquote>
+<p>读取和编译 JavaScript 代码。这并不意味着它只是个简单的引擎。比如，JavaScriptCore 就有六个“构建模块”可以分析、解释、优化、垃圾回收 JavaScript 代码。</p>
+</blockquote>
+<p>简单来说，JavaScript 引擎会加载你的源代码，把它分解成字符串（又叫做分词），再把这些字符串转换 成编译器可以理解的字节码，然后执行这些字节码。</p>
+<p>为什么存在这么多不同的JS引擎?</p>
+<blockquote>
+<ol>
+<li>每个 JavaScript 引擎都实现了一个版本的 ECMAScript，JavaScript 是它的一个分支。随着 ECMAScript 的不断发展，JavaScript 引擎也不断改进。</li>
+<li>之所以有这么多不同的引擎，是因为它们每个都被设计运行在不同的 web 浏览器、或者像 Node.js 那样的运行时环境中</li>
+</ol>
+</blockquote>
+<p>Node.js 和 JavaScript 引擎的关系?</p>
+<blockquote>
+<p>Node.js 是一个异步的、事件驱动的框架，让你在服务器端可以使用 JavaScript。既然他们是驱动 JavaScript 的工具，所以它们也是由 JavaScript 引擎驱动。</p>
+</blockquote>
+<p>UIWebView &amp; WKWebView中的JSCore的不同？</p>
+<blockquote>
+<ol>
+<li>JavaScriptCore 被改写为 SquirrelFish，升级版本为 QuirrelFish Extreme，也叫做 Nitro。然而，构成 Webkit 实现基础的 JavaScript 引擎就是 JavaScriptCore（比如 Safari）。</li>
+<li>iOS 开发者应该要知道移动设备的 Safari 使用 Nitro，但是 UIWebView 不包括 JIT 编译，所以体验会慢一些。然而开发人员可以在 iOS8 中使用包含 Nitro 的 WKWebView，使用体验 明显 变快。混合移动应用程序的开发人员应该能松口气了。</li>
+</ol>
+</blockquote>
+<p>参考：<br><a href="http://web.jobbole.com/84351/" target="_blank" rel="noopener">一篇给小白看的 JavaScript 引擎指南</a><br><a href="https://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651748649&idx=2&sn=3909ebe4e33eed50fe5d75b61a3d4203&chksm=bd12a0648a652972bf89f9bfc14cfbcaff5aee2fb617e89cc084bd2c1c0a58e5958f39cb32f2&mpshare=1&scene=23&srcid=0824vnG0kYoLs8Jguw3wdIgB%23rd" target="_blank" rel="noopener">深入理解JavaScriptCore</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/11/20180111初窥小程序/" rel="next" title="初窥小程序">
+                <i class="fa fa-chevron-left"></i> 初窥小程序
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/02/20180902前端渲染-服务端渲染/" rel="prev" title="前端渲染&服务端渲染">
+                前端渲染&服务端渲染 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTMzNy81OTA1"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">wangdetong</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#主流引擎"><span class="nav-number">1.</span> <span class="nav-text">主流引擎</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#浏览器的主要构成"><span class="nav-number">2.</span> <span class="nav-text">浏览器的主要构成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WebKit"><span class="nav-number">3.</span> <span class="nav-text">WebKit</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#WebKit-Embedding-API"><span class="nav-number">3.1.</span> <span class="nav-text">WebKit Embedding API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WebKit-Ports"><span class="nav-number">3.2.</span> <span class="nav-text">WebKit Ports</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WebCore"><span class="nav-number">3.3.</span> <span class="nav-text">WebCore</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JavaScriptCore"><span class="nav-number">3.4.</span> <span class="nav-text">JavaScriptCore</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#渲染引擎"><span class="nav-number">4.</span> <span class="nav-text">渲染引擎</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JavaScript引擎"><span class="nav-number">5.</span> <span class="nav-text">JavaScript引擎</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangdetong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

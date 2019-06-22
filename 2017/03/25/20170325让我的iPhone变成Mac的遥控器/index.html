@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-cn">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="概要背景有一次我刚回到家，想起来公司的Mac 没有关机，由于最近公司强调保护自己隐私与节约用电，需要在下班后Mac关机，我就着急忙慌的给加班的同事打电话，帮忙给我的Mac关机；有时，晚上我躺着床上用Mac看电影，看困了，还不得不爬起来去关电脑；💡如果我们可以iPhone远程控制Mac，就可以解决上面的问题了。💡">
+<meta property="og:type" content="article">
+<meta property="og:title" content="让我的iPhone变成Mac的遥控器">
+<meta property="og:url" content="http://yoursite.com/2017/03/25/20170325让我的iPhone变成Mac的遥控器/index.html">
+<meta property="og:site_name" content="iKiwi">
+<meta property="og:description" content="概要背景有一次我刚回到家，想起来公司的Mac 没有关机，由于最近公司强调保护自己隐私与节约用电，需要在下班后Mac关机，我就着急忙慌的给加班的同事打电话，帮忙给我的Mac关机；有时，晚上我躺着床上用Mac看电影，看困了，还不得不爬起来去关电脑；💡如果我们可以iPhone远程控制Mac，就可以解决上面的问题了。💡">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="http://yoursite.com/2017/03/25/20170325让我的iPhone变成Mac的遥控器/20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/a.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/25/20170325让我的iPhone变成Mac的遥控器/20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/b.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/25/20170325让我的iPhone变成Mac的遥控器/20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/c.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/25/20170325让我的iPhone变成Mac的遥控器/20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/d.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/25/20170325让我的iPhone变成Mac的遥控器/20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/e.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/25/20170325让我的iPhone变成Mac的遥控器/20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/f.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/25/20170325让我的iPhone变成Mac的遥控器/20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/g.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/25/20170325让我的iPhone变成Mac的遥控器/20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/h.png">
+<meta property="og:updated_time" content="2019-06-22T03:32:12.488Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="让我的iPhone变成Mac的遥控器">
+<meta name="twitter:description" content="概要背景有一次我刚回到家，想起来公司的Mac 没有关机，由于最近公司强调保护自己隐私与节约用电，需要在下班后Mac关机，我就着急忙慌的给加班的同事打电话，帮忙给我的Mac关机；有时，晚上我躺着床上用Mac看电影，看困了，还不得不爬起来去关电脑；💡如果我们可以iPhone远程控制Mac，就可以解决上面的问题了。💡">
+<meta name="twitter:image" content="http://yoursite.com/2017/03/25/20170325让我的iPhone变成Mac的遥控器/20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/a.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/25/20170325让我的iPhone变成Mac的遥控器/">
+
+
+
+
+
+  <title>让我的iPhone变成Mac的遥控器 | iKiwi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">iKiwi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/25/20170325让我的iPhone变成Mac的遥控器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">让我的iPhone变成Mac的遥控器</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-25T00:00:00+08:00">
+                2017-03-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mac/" itemprop="url" rel="index">
+                    <span itemprop="name">Mac</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>有一次我刚回到家，想起来公司的Mac 没有关机，由于最近公司强调保护自己隐私与节约用电，需要在下班后Mac关机，我就着急忙慌的给加班的同事打电话，帮忙给我的Mac关机；<br>有时，晚上我躺着床上用Mac看电影，看困了，还不得不爬起来去关电脑；<br>💡如果我们可以iPhone远程控制Mac，就可以解决上面的问题了。💡</p>
+<a id="more"></a>
+
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>Mac 上需要有一个能根据iPhone上的指令自动触发 AppleScript 的后台程序。而正好，Mac 上的 Mail &amp; Message 都自带了自动运行 AppleScript 功能</p>
+<h3 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h3><p>根据Mail 或 Message收到的信息，去执行 AppleScript 来控制Mac</p>
+<h2 id="mail篇"><a href="#mail篇" class="headerlink" title="mail篇"></a>mail篇</h2><h3 id="mail让Mac休眠"><a href="#mail让Mac休眠" class="headerlink" title="mail让Mac休眠"></a>mail让Mac休眠</h3><p>通过我的QQ邮箱给 Mac上的邮箱发邮件，达到屏幕休眠的效果。</p>
+<h4 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h4><p>1，mail 启用自动触发 AppleScript 的方法是在应用偏好设置:「规则 - 添加规则」<br><img src="20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/a.png" alt="logo"></p>
+<p>2，填写内容</p>
+<ol>
+<li>描述：QQ Close Screen</li>
+<li>执行脚本的条件：（避免他人给自己发邮件，造成误伤！）<br> 发件人:<a href="mailto:1875734581@qq.com" target="_blank" rel="noopener">1875734581@qq.com</a><br> 主题:CloseScreen</li>
+<li>满足条件后执行的事件:<br> 删除邮件、标记已读（毕竟是自己发给自己的邮件，可以保留）<br> 执行脚本：选择自己的脚本<br><img src="20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/b.png" alt="logo"></li>
+</ol>
+<p>3，创建脚本 <code>Close Screen.scpt</code>，其内容是：<br><code>do shell script &quot;pmset displaysleepnow&quot;</code><br>点击运行，屏幕会休眠。<br><img src="20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/c.png" alt="logo"></p>
+<p>存储到mail指定的文件夹下，然后在规则中选择Close Screen.scpt<br><img src="20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/d.png" alt="logo"></p>
+<h4 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h4><p>现在通过mail可以让屏幕会休眠了，当然修改命令 可以到达 Mac锁屏／关机的效果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">--Mac锁屏</span><br><span class="line">do shell script &quot;/System/Library/CoreServices/Menu\\ Extras/User.menu/Contents/Resources/CGSession -suspend&quot;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-- Mac关机</span><br><span class="line">tell application &quot;System Events&quot; to shut down</span><br></pre></td></tr></table></figure>
+
+<h3 id="尝试隐藏在Dock上mail图标（可以跳过）"><a href="#尝试隐藏在Dock上mail图标（可以跳过）" class="headerlink" title="尝试隐藏在Dock上mail图标（可以跳过）"></a>尝试隐藏在Dock上mail图标（可以跳过）</h3><h4 id="隐藏Foxmail-app成功，而隐藏mail-app失败。"><a href="#隐藏Foxmail-app成功，而隐藏mail-app失败。" class="headerlink" title="隐藏Foxmail.app成功，而隐藏mail.app失败。"></a>隐藏Foxmail.app成功，而隐藏mail.app失败。</h4><h5 id="下载Foxmail-app试水"><a href="#下载Foxmail-app试水" class="headerlink" title="下载Foxmail.app试水"></a>下载Foxmail.app试水</h5><p>查了一下，解决方案很简单：在app对应的info.plist最后加上LSUIElement即可</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;key&gt;LSUIElement&lt;/key&gt;</span><br><span class="line">&lt;string&gt;1&lt;/string&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/e.png" alt="logo"></p>
+<p>加上之后，打不开app，错误信息类似：签名失败<br>Google一下，需要强制签名，命令如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo codesign -f --preserve-metadata=entitlements -s &quot;iPhone Developer: zheng mingjun (NFN785YGLJ)&quot; /Applications/Foxmail.app</span><br><span class="line">xattr -cr /Applications/Foxmail.app</span><br><span class="line">xattr -lr /Applications/Foxmail.app</span><br></pre></td></tr></table></figure>
+
+<p>成功了，效果如下：<br><img src="20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/f.png" alt="logo"></p>
+<h5 id="开始-mail-app"><a href="#开始-mail-app" class="headerlink" title="开始 mail.app"></a>开始 mail.app</h5><p>1，由于 mail.app 是受系统保护的，需要让保护取消：<br>重启-&gt; 长按command+R -&gt; 工具中找到 终端 -&gt;输入 csrutil disable; reboot 即可</p>
+<p>2，然后按照Foxmail.app的方式处理，最后的结果是：签名非法 -&gt;mail.app永远打不开了…)<br>从同事那里copy一个mail.app命名为mail2.app 使用。</p>
+<p>3，为了安全起见，最后别忘了 csrutil enable</p>
+<h2 id="message篇"><a href="#message篇" class="headerlink" title="message篇"></a>message篇</h2><h3 id="message让Mac休眠"><a href="#message让Mac休眠" class="headerlink" title="message让Mac休眠"></a>message让Mac休眠</h3><p>Message 启用自动触发 AppleScript 的方法是在应用偏好设置中打开 「通用 - AppleScript 处理程序」菜单，从中选择我们想要运行的 AppleScript。<br><img src="20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/g.png" alt="logo"></p>
+<p>令人意外的是，苹果已经为我们准备好了几个十分有用的 AppleScript，例如用来遥控 iTunes 的 iTunes Remote Control，现在打开iTunes Remote Control.applescript</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-- sender发来的信息会走下面的方法</span><br><span class="line">on message received theMessage from theBuddy for theChat</span><br><span class="line">-- do something</span><br><span class="line">end message received</span><br></pre></td></tr></table></figure>
+
+<p>iTunes Remote Control.applescript是既然是控制 iTunes 的，我们需要写一个控制Mac Screen的，则可以copy一份applescript并命名为PlayGame.applescript，只需要修改方法on message received theMessage from theBuddy for theChat就行了。<br><img src="20170325%E8%AE%A9%E6%88%91%E7%9A%84iPhone%E5%8F%98%E6%88%90Mac%E7%9A%84%E9%81%A5%E6%8E%A7%E5%99%A8/h.png" alt="logo"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">-- 截取&quot;;&quot;前的字段，判断需要执行的命令</span><br><span class="line">on setScreenCommands(senderMessageString)</span><br><span class="line">set separator to &quot;;&quot;</span><br><span class="line">if (senderMessageString contains separator) then</span><br><span class="line">	set commandString to text 1 thru ((offset of separator in senderMessageString) - 1) of senderMessageString</span><br><span class="line">	if (commandString contains &quot;CloseScreen&quot;) then</span><br><span class="line">		do shell script &quot;pmset displaysleepnow&quot;</span><br><span class="line">	else if (commandString contains &quot;LockScreen&quot;) then</span><br><span class="line">		do shell script &quot;/System/Library/CoreServices/Menu\\ Extras/User.menu/Contents/Resources/CGSession -suspend&quot;</span><br><span class="line">	else if (commandString contains &quot;ShutDown&quot;) then</span><br><span class="line">		tell application &quot;System Events&quot; to shut down</span><br><span class="line">	end if</span><br><span class="line">end if</span><br><span class="line">end setScreenCommands</span><br></pre></td></tr></table></figure>
+
+<p>测试一下：自己发送一个”CloseScreen;” Mac休眠了。</p>
+<h2 id="mail-amp-message-简单比较"><a href="#mail-amp-message-简单比较" class="headerlink" title="mail &amp; message 简单比较"></a>mail &amp; message 简单比较</h2><h3 id="mail"><a href="#mail" class="headerlink" title="mail"></a>mail</h3><p>简单：基本不需要编程，只需要配置执行脚本的条件就行了<br>机型：iPhone与android手机，只要按照任意一款mail.app,比如QQ邮箱…</p>
+<h3 id="message"><a href="#message" class="headerlink" title="message"></a>message</h3><p>灵活：需要编程来实现（可以扩展更多功能）<br>机型：iPhone手机（iMessage）</p>
+<h2 id="后续"><a href="#后续" class="headerlink" title="后续"></a>后续</h2><p>之后写了一篇关于《AppleScript让iMessage更好玩》的文章自动回复的机器人</p>
+<p>参考：<br><a href="http://osxdaily.com/2015/10/05/disable-rootless-system-integrity-protection-mac-os-x/" target="_blank" rel="noopener">取消Mac系统保护</a><br><a href="https://developer.apple.com/library/content/documentation/LanguagesUtilities/Conceptual/MacAutomationScriptingGuide/UseScriptLibraries.html#//apple_ref/doc/uid/TP40016239-CH36-SW1" target="_blank" rel="noopener">AppleScript教程</a><br><a href="https://sspai.com/post/35799" target="_blank" rel="noopener">无需第三方 App，同样可以把你的 iOS 设备变成 Mac「遥控器」</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/13/20170313dylib注入-防御/" rel="next" title="dylib注入-防御">
+                <i class="fa fa-chevron-left"></i> dylib注入-防御
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/02/20170402AppleScript让iMessage更好玩/" rel="prev" title="AppleScript让iMessage更好玩">
+                AppleScript让iMessage更好玩 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTMzNy81OTA1"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">wangdetong</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概要"><span class="nav-number">1.</span> <span class="nav-text">概要</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#背景"><span class="nav-number">1.1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#原理"><span class="nav-number">1.2.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方案"><span class="nav-number">1.3.</span> <span class="nav-text">方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mail篇"><span class="nav-number">2.</span> <span class="nav-text">mail篇</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#mail让Mac休眠"><span class="nav-number">2.1.</span> <span class="nav-text">mail让Mac休眠</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#步骤"><span class="nav-number">2.1.1.</span> <span class="nav-text">步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#拓展"><span class="nav-number">2.1.2.</span> <span class="nav-text">拓展</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#尝试隐藏在Dock上mail图标（可以跳过）"><span class="nav-number">2.2.</span> <span class="nav-text">尝试隐藏在Dock上mail图标（可以跳过）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#隐藏Foxmail-app成功，而隐藏mail-app失败。"><span class="nav-number">2.2.1.</span> <span class="nav-text">隐藏Foxmail.app成功，而隐藏mail.app失败。</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#下载Foxmail-app试水"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">下载Foxmail.app试水</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#开始-mail-app"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">开始 mail.app</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#message篇"><span class="nav-number">3.</span> <span class="nav-text">message篇</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#message让Mac休眠"><span class="nav-number">3.1.</span> <span class="nav-text">message让Mac休眠</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mail-amp-message-简单比较"><span class="nav-number">4.</span> <span class="nav-text">mail &amp; message 简单比较</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#mail"><span class="nav-number">4.1.</span> <span class="nav-text">mail</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#message"><span class="nav-number">4.2.</span> <span class="nav-text">message</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后续"><span class="nav-number">5.</span> <span class="nav-text">后续</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangdetong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

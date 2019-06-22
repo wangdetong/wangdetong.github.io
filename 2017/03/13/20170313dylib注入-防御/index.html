@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-cn">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="概要1, dylib注入app的基本流程：通过iOSOpenDev新建dylib -&amp;gt; yololib把dylib注入app -&amp;gt;MachOView查看注入是否成功 -&amp;gt; 复制 dylib到 TEST.app中 -&amp;gt; iOS App Signer 对TEST.app重签名 -&amp;gt;安装app2, 防止app被注入：由于在加在dylib前，会判断有没有RESTRICT，有就">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dylib注入-防御">
+<meta property="og:url" content="http://yoursite.com/2017/03/13/20170313dylib注入-防御/index.html">
+<meta property="og:site_name" content="iKiwi">
+<meta property="og:description" content="概要1, dylib注入app的基本流程：通过iOSOpenDev新建dylib -&amp;gt; yololib把dylib注入app -&amp;gt;MachOView查看注入是否成功 -&amp;gt; 复制 dylib到 TEST.app中 -&amp;gt; iOS App Signer 对TEST.app重签名 -&amp;gt;安装app2, 防止app被注入：由于在加在dylib前，会判断有没有RESTRICT，有就">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="http://yoursite.com/2017/03/13/20170313dylib注入-防御/20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/a.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/13/20170313dylib注入-防御/20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/b.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/13/20170313dylib注入-防御/20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/c.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/13/20170313dylib注入-防御/20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/d.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/13/20170313dylib注入-防御/20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/e.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/13/20170313dylib注入-防御/20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/g.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/13/20170313dylib注入-防御/20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/h.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/13/20170313dylib注入-防御/20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/i.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/13/20170313dylib注入-防御/20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/h.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/13/20170313dylib注入-防御/20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/k.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/13/20170313dylib注入-防御/20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/l.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/13/20170313dylib注入-防御/20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/m.png">
+<meta property="og:updated_time" content="2019-06-22T03:32:12.461Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="dylib注入-防御">
+<meta name="twitter:description" content="概要1, dylib注入app的基本流程：通过iOSOpenDev新建dylib -&amp;gt; yololib把dylib注入app -&amp;gt;MachOView查看注入是否成功 -&amp;gt; 复制 dylib到 TEST.app中 -&amp;gt; iOS App Signer 对TEST.app重签名 -&amp;gt;安装app2, 防止app被注入：由于在加在dylib前，会判断有没有RESTRICT，有就">
+<meta name="twitter:image" content="http://yoursite.com/2017/03/13/20170313dylib注入-防御/20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/a.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/13/20170313dylib注入-防御/">
+
+
+
+
+
+  <title>dylib注入-防御 | iKiwi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">iKiwi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/13/20170313dylib注入-防御/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">dylib注入-防御</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-13T00:00:00+08:00">
+                2017-03-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>1, dylib注入app的基本流程：通过iOSOpenDev新建dylib -&gt; yololib把dylib注入app -&gt;MachOView查看注入是否成功 -&gt; 复制 dylib到 TEST.app中 -&gt; iOS App Signer 对TEST.app重签名 -&gt;安装app<br>2, 防止app被注入：由于在加在dylib前，会判断有没有RESTRICT，有就不加载dylib了。这里添加了RESTRICT。<br>3, 打破app防御：破坏RESTRICT这个section。</p>
+<a id="more"></a>
+
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p><a href="http://www.jianshu.com/p/29580725707a" target="_blank" rel="noopener">iOSOpenDev</a>：在Xcode上创建dylib<br><a href="https://github.com/KJCracks/yololib" target="_blank" rel="noopener">yololib</a>：把dylib注入到app中<br><a href="https://github.com/DanTheMan827/ios-app-signer" target="_blank" rel="noopener">iOS App Signer</a>:app重签名<br><a href="https://sourceforge.net/projects/machoview/" target="_blank" rel="noopener">MachOView</a>:查看MachO文件的结构，顺便查看注入是否成功<br>PP助手:可以帮助我们简单的安装app、下载已经砸完壳的app<br><a href="https://laoyur.com/archives/158" target="_blank" rel="noopener">idevicesyslog</a>:打印手机的实时log信息</p>
+<h3 id="创建dylib"><a href="#创建dylib" class="headerlink" title="创建dylib"></a>创建dylib</h3><p>通过iOSOpenDev提供的templates，在Xcode中新建project时选择CaptainHookTweak，创建名为hook.dylib。其内容只是简单的打印hello, world!sbsbsb<br><img src="20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/a.png" alt="logo"></p>
+<h3 id="获得一个app"><a href="#获得一个app" class="headerlink" title="获得一个app"></a>获得一个app</h3><p>为了后面的操作方便，这里创建一个project命名为TEST，内容不做任何修改，只确定编译后生成一个 release 版本就行<br><img src="20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/b.png" alt="logo"></p>
+<h2 id="dylib-注入-app"><a href="#dylib-注入-app" class="headerlink" title="dylib 注入 app"></a>dylib 注入 app</h2><p>为了方便，我把TEST.app 和 hook.dylib放在了同一个目录。把TEST.app 多备份些（TEST1.app、TEST2.app），再次注入时，使用备份的TEST*.app(干净无污染的)。</p>
+<h3 id="通过yololib把dylib注入app中。"><a href="#通过yololib把dylib注入app中。" class="headerlink" title="通过yololib把dylib注入app中。"></a>通过yololib把dylib注入app中。</h3><p>为了以后更方便的使用yololib，可以把其存在一个隐藏文件夹中(看起来整洁)，通过设置环境变量的形式使用yololib<br><img src="20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/c.png" alt="logo"></p>
+<ol>
+<li>设置环境变量:</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># ios_reverse</span><br><span class="line">export TOOLS_HOME=/Users/wangdt/.tools/</span><br><span class="line">export PATH=$PATH:$TOOLS_HOME</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>yololib命令：yololib TEST.app/TEST hook.dylib</li>
+</ol>
+<h3 id="用MachOView查看是否注入成功"><a href="#用MachOView查看是否注入成功" class="headerlink" title="用MachOView查看是否注入成功"></a>用MachOView查看是否注入成功</h3><p><img src="20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/d.png" alt="logo"></p>
+<h3 id="复制-hook-dylib到-文件夹TEST-app里"><a href="#复制-hook-dylib到-文件夹TEST-app里" class="headerlink" title="复制 hook.dylib到 文件夹TEST.app里"></a>复制 hook.dylib到 文件夹TEST.app里</h3><p>yololib只是在load commands中声明了hook.dylib，具体的hook.dylib的内容还是需要的，否则会在打开app时闪退。<br>cp hook.dylib TEST.app</p>
+<h3 id="用iOS-app-Signer-重签名"><a href="#用iOS-app-Signer-重签名" class="headerlink" title="用iOS app Signer 重签名"></a>用iOS app Signer 重签名</h3><ol>
+<li>选择正确的签名、证书</li>
+<li>如果重签名成功的话，提示Done,outpu at ***，并生成TEST.ipa，当然错误会有相应的提示。<br><img src="20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/e.png" alt="logo"></li>
+</ol>
+<h3 id="用PP助手-把TEST-ipa安装到手机上"><a href="#用PP助手-把TEST-ipa安装到手机上" class="headerlink" title="用PP助手 把TEST.ipa安装到手机上"></a>用PP助手 把TEST.ipa安装到手机上</h3><ol>
+<li>直接把TEST.ipa拽到 PP助手上就开始安装了</li>
+<li>如果没问题，就安装成功了，安装失败可能是 dylib 注入失败，可以用MachOView检查一下。</li>
+</ol>
+<h3 id="idevicesyslog检查是否dylib-注入成功"><a href="#idevicesyslog检查是否dylib-注入成功" class="headerlink" title="idevicesyslog检查是否dylib 注入成功"></a>idevicesyslog检查是否dylib 注入成功</h3><ol>
+<li>在打开手机上的TEST之前，输入idevicesyslog命令，是可以看到实时的log信息的，不过太多了，翻页太麻烦了，倒不如直接把log信息输入到文件中去<br><code>idevicesyslog &gt; log.txt</code></li>
+<li>如果 搜到hello, world!sbsbsb说明dylib注入成功了，否则注入失败；</li>
+<li>还有可能打开app就闪退了，很有可能你没有把hook.dylib 复制到TEST.app文件夹下<br><img src="20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/g.png" alt="logo"></li>
+</ol>
+<h2 id="认识一下dylib的command"><a href="#认识一下dylib的command" class="headerlink" title="认识一下dylib的command"></a>认识一下dylib的command</h2><h3 id="dylib的结构"><a href="#dylib的结构" class="headerlink" title="dylib的结构"></a>dylib的结构</h3><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 关于dylib结构体：在 &lt;mach-o/loader.h&gt;中</span></span><br><span class="line"><span class="keyword">struct</span> dylib_command &#123; uint_32 cmd; uint_32 cmdsize; <span class="keyword">struct</span> dylib dylib; &#125;;</span><br><span class="line"><span class="keyword">struct</span> dylib &#123; <span class="keyword">union</span> lc_str name; uint_32 timestamp; uint_32 current_version; uint_32 compatibility_version; &#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="dylib-command-gt-cmd的值"><a href="#dylib-command-gt-cmd的值" class="headerlink" title="dylib_command -&gt; cmd的值"></a><code>dylib_command</code> -&gt; cmd的值</h3><p>这里只留下了本次 需要用的：<code>LC_LOAD_DYLIB、LC_LOAD_WEAK_DYLIB 、LC_REQ_DYLD</code></p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#define LC_REQ_DYLD 0x80000000</span></span><br><span class="line"><span class="comment">/* Constants for the cmd field of all load commands, the type */</span></span><br><span class="line">...</span><br><span class="line"><span class="meta">#define	LC_LOAD_DYLIB	0xc	/* load a dynamically linked shared library */</span></span><br><span class="line">...</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* load a dynamically linked shared library that is allowed to be missing</span></span><br><span class="line"><span class="comment">* (all symbols are weak imported).</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="meta">#define	LC_LOAD_WEAK_DYLIB (0x18 | LC_REQ_DYLD)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="LC-LOAD-DYLIB"><a href="#LC-LOAD-DYLIB" class="headerlink" title="LC_LOAD_DYLIB"></a><code>LC_LOAD_DYLIB</code></h3><p>app启动的时候, 会加载ImageLoadermach_header中的dylib, 每个dylib中的cmd状态为LC_LOAD_DYLIB就会被加载，如果未找到dylib就会抛出异常.（这就是 为什么yololib后需要复制 dylib的原因了）</p>
+<h3 id="LC-LOAD-WEAK-DYLIB"><a href="#LC-LOAD-WEAK-DYLIB" class="headerlink" title="LC_LOAD_WEAK_DYLIB"></a><code>LC_LOAD_WEAK_DYLIB</code></h3><p>意味着这个dylib是可选的，没有找到也没有什么</p>
+<h3 id="测试一下LC-LOAD-WEAK-DYLIB"><a href="#测试一下LC-LOAD-WEAK-DYLIB" class="headerlink" title="测试一下LC_LOAD_WEAK_DYLIB"></a>测试一下<code>LC_LOAD_WEAK_DYLIB</code></h3><ol>
+<li><p>拿一个新的TEST.app ，用yololib注入hook.dylib，但不复制 hook.dylib</p>
+</li>
+<li><p>用MachOView打开TEST二进制文件<br><img src="20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/h.png" alt="logo"></p>
+</li>
+</ol>
+<p>修改 为weak的值：80000018 ，因为<code>LC_LOAD_WEAK_DYLIB (0x18 | LC_REQ_DYLD)</code><br><img src="20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/i.png" alt="logo"></p>
+<ol start="3">
+<li>用iOS App Signer 重签名,把app安装到手机上，用idevcesyslog查看log：没有crash，没有hello, world!sbsbsb 证明了<code>LC_LOAD_WEAK_DYLIB</code>的作用</li>
+</ol>
+<h2 id="防止app被注入"><a href="#防止app被注入" class="headerlink" title="防止app被注入"></a>防止app被注入</h2><p>思路: 如果app在启动时拒绝加载 inserted dylibs就可以了，也就是说 不加载环境变量DYLD_INSERT_LIBRARIES中的path(es)。</p>
+<p>当运行的时候Mach-O文件里面segments会检测有没有restricted的情况下, 有的话就会忽略DYLD_INSERT_LIBRARIES，就做到了防止app被注入dylib.<br><a href="https://pewpewthespells.com/blog/blocking_code_injection_on_ios_and_os_x.html" target="_blank" rel="noopener">Blocking Code Injection on iOS and OS X</a></p>
+<blockquote>
+<p>When an application is launched the binary is run through dyld and that processes the binary file.<br>This finds what libraries it needs to load and link against to generate a complete symbol table.<br>Doing this requires parsing through the binary header,while it does this it can trigger flags in<br>dyld based on what segments are present in the binary. There is a special flag that will be set for binaries<br>that are marked as “restricted”.<br>This special flag means that the dynamic linker should ignore any set environment variables.</p>
+</blockquote>
+<p>具体操作：<br>在项目中Xcode Other Linker Flags<br><code>-Wl,-sectcreate,__RESTRICT,__restrict,/dev/null</code><br><img src="20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/h.png" alt="logo"></p>
+<p>编译后的app -&gt; yololib注入dylib -&gt; 用MachOView查看，是否有restrict Section<br><img src="20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/k.png" alt="logo"></p>
+<p>有：-&gt; 用iOS App Signer重签名 -&gt; 用pp助手安装 -&gt; idevicesyslog查看log信息：发现没有 hello, world!sbsbsb，证明 __RESTRICT防注入成功</p>
+<h2 id="打破app防御"><a href="#打破app防御" class="headerlink" title="打破app防御"></a>打破app防御</h2><p>让dylb的环境变量DYLD_INSERT_LIBRARIES找不到RESTRICT就行了。通过二进制修改工具010Editor，把名为 RESTRICT 的Section重命名为RRSTRICT（有6处需要修改）<br><img src="20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/l.png" alt="logo"></p>
+<p>用MachOView查看修改结果injection2<br><img src="20170313dylib%E6%B3%A8%E5%85%A5-%E9%98%B2%E5%BE%A1/m.png" alt="logo"></p>
+<p>走遍安装app的流程，查看打印log,发现 hello, world!sbsbsb 证明 打破app防御成功。</p>
+<p>参考文献：<br><a href="https://pewpewthespells.com/blog/blocking_code_injection_on_ios_and_os_x.html" target="_blank" rel="noopener">Blocking Code Injection on iOS and OS X </a><br><a href="https://makezl.github.io/2016/06/27/dylib/" target="_blank" rel="noopener">dylib浅析</a><br><a href="http://bbs.iosre.com/t/tweak-app-app-tweak/438" target="_blank" rel="noopener">iOSRE-防止tweak依附，App有高招</a><br><a href="https://github.com/Urinx/iOSAppHook" target="_blank" rel="noopener">非越狱环境下iOS应用逆向研究</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/20/20170220预防app-crash之insert-nil/" rel="next" title="预防app crash之insert nil">
+                <i class="fa fa-chevron-left"></i> 预防app crash之insert nil
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/25/20170325让我的iPhone变成Mac的遥控器/" rel="prev" title="让我的iPhone变成Mac的遥控器">
+                让我的iPhone变成Mac的遥控器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTMzNy81OTA1"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">wangdetong</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概要"><span class="nav-number">1.</span> <span class="nav-text">概要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#准备工作"><span class="nav-number">2.</span> <span class="nav-text">准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建dylib"><span class="nav-number">2.1.</span> <span class="nav-text">创建dylib</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获得一个app"><span class="nav-number">2.2.</span> <span class="nav-text">获得一个app</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dylib-注入-app"><span class="nav-number">3.</span> <span class="nav-text">dylib 注入 app</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通过yololib把dylib注入app中。"><span class="nav-number">3.1.</span> <span class="nav-text">通过yololib把dylib注入app中。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#用MachOView查看是否注入成功"><span class="nav-number">3.2.</span> <span class="nav-text">用MachOView查看是否注入成功</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#复制-hook-dylib到-文件夹TEST-app里"><span class="nav-number">3.3.</span> <span class="nav-text">复制 hook.dylib到 文件夹TEST.app里</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#用iOS-app-Signer-重签名"><span class="nav-number">3.4.</span> <span class="nav-text">用iOS app Signer 重签名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#用PP助手-把TEST-ipa安装到手机上"><span class="nav-number">3.5.</span> <span class="nav-text">用PP助手 把TEST.ipa安装到手机上</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#idevicesyslog检查是否dylib-注入成功"><span class="nav-number">3.6.</span> <span class="nav-text">idevicesyslog检查是否dylib 注入成功</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#认识一下dylib的command"><span class="nav-number">4.</span> <span class="nav-text">认识一下dylib的command</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#dylib的结构"><span class="nav-number">4.1.</span> <span class="nav-text">dylib的结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dylib-command-gt-cmd的值"><span class="nav-number">4.2.</span> <span class="nav-text">dylib_command -&gt; cmd的值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LC-LOAD-DYLIB"><span class="nav-number">4.3.</span> <span class="nav-text">LC_LOAD_DYLIB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LC-LOAD-WEAK-DYLIB"><span class="nav-number">4.4.</span> <span class="nav-text">LC_LOAD_WEAK_DYLIB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试一下LC-LOAD-WEAK-DYLIB"><span class="nav-number">4.5.</span> <span class="nav-text">测试一下LC_LOAD_WEAK_DYLIB</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#防止app被注入"><span class="nav-number">5.</span> <span class="nav-text">防止app被注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#打破app防御"><span class="nav-number">6.</span> <span class="nav-text">打破app防御</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangdetong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-cn">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="最近一直在弄app瘦身的相关工作，除了常规的瘦身方案外，今天看了另外一种思路：移除无用的mach-o文件。 我就尝试用python脚本实现它python脚本的地址">
+<meta property="og:type" content="article">
+<meta property="og:title" content="app瘦身之移除无用macho文件">
+<meta property="og:url" content="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/index.html">
+<meta property="og:site_name" content="iKiwi">
+<meta property="og:description" content="最近一直在弄app瘦身的相关工作，除了常规的瘦身方案外，今天看了另外一种思路：移除无用的mach-o文件。 我就尝试用python脚本实现它python脚本的地址">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/a.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/b.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/c.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/d.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/e.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/f.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/g.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/h.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/i.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/j.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/k.png">
+<meta property="og:updated_time" content="2019-06-22T03:32:12.590Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="app瘦身之移除无用macho文件">
+<meta name="twitter:description" content="最近一直在弄app瘦身的相关工作，除了常规的瘦身方案外，今天看了另外一种思路：移除无用的mach-o文件。 我就尝试用python脚本实现它python脚本的地址">
+<meta name="twitter:image" content="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/a.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/">
+
+
+
+
+
+  <title>app瘦身之移除无用macho文件 | iKiwi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">iKiwi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/25/20170825app瘦身之移除无用macho文件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">app瘦身之移除无用macho文件</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-25T00:00:00+08:00">
+                2017-08-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近一直在弄app瘦身的相关工作，除了常规的瘦身方案外，今天看了另外一种思路：<a href="https://mp.weixin.qq.com/s?__biz=MzA4MjA0MTc4NQ==&mid=504089563&idx=1&sn=9328409758177cb6df3edbb3b8a0c161#rd" target="_blank" rel="noopener">移除无用的mach-o文件</a>。
+我就尝试用python脚本实现它<a href="https://github.com/wangdetong/app_thin_for_framework" target="_blank" rel="noopener">python脚本的地址</a></p>
+<a id="more"></a>
+
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>如果 other linker flags不设置参数的话，linker会把有用到的类加载到可执行文件中，没有用到的不会被加载进来，咦？这不正是我们想要的瘦身吗？是呀！😄到这里就可以return了吗？不！</p>
+<h3 id="静态库中catergory问题、linker、symbol"><a href="#静态库中catergory问题、linker、symbol" class="headerlink" title="静态库中catergory问题、linker、symbol"></a>静态库中catergory问题、linker、symbol</h3><p>举个例子：libA静态库中声明了category的话，如果在项目中引入这个libA并且使用里面的category方法，在编译时不会报错，而在run时会报错如下：<br><img src="20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/a.png" alt="logo"></p>
+<p>原因：</p>
+<blockquote>
+<p>The “selector not recognized” runtime exception occurs due to an issue between the implementation of standard UNIX static libraries, the linker and the dynamic nature of Objective-C. Objective-C does not define linker symbols for each function (or method, in Objective-C) - instead, linker symbols are only generated for each class. If you extend a pre-existing class with categories, the linker does not know to associate the object code of the core class implementation and the category implementation. This prevents objects created in the resulting application from responding to a selector that is defined in the category.</p>
+</blockquote>
+<p>简单来说：linker不知道如何把原类方法和分类新增加的方法放在一起，也就是说在linker链接后的可执行文件中不存在category的内容！！！<br>❤️❤️❤️上面的解释和<a href="https://developer.apple.com/library/content/qa/qa1490/_index.html" target="_blank" rel="noopener">Apple官方QA</a>介绍还是有点区别，来看看官方的（红色标注为我的理解！！！）<br><img src="20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/b.png" alt="logo"></p>
+<p>通过Apple官方QA介绍得知：</p>
+<ol>
+<li>UNIX static library: 是*.o文件的集合</li>
+<li>Linker 是解决 undefine symbols的：把定义了undefine symbols的 *.o文件加载到 exe中，并且一般情况下，linker只会link 包含symbol的 .o file到final exe中，而不是所有的.o file！（除非设置了other linker flags）</li>
+<li>C语言：只为method生成symbol</li>
+<li>OC：只为class生成symbol。举个例子：项目中的A.m中调用static framework的B的category的test_safe()时，调用的方式是[[B new] test_safe]，会生成关于 B.o的undefine symbol。（编译器并不允许我们这样使用 [[B+safe new] test_safe]！！！）<h3 id="other-linker-flags解决问题"><a href="#other-linker-flags解决问题" class="headerlink" title="other linker flags解决问题"></a>other linker flags解决问题</h3>通过上面可以知道静态库中存在category时，使用category中国年的方法是有问题的！解决方案就是通过设置other link flag参数:-ObjC<br>“from Stack OverFlow”:<blockquote>
+<p>This flag causes the linker to load every object file in the library that defines an Objective-C class or category. While this option will typically result in a larger executable (due to additional object code loaded into the application), it will allow the successful creation of effective Objective-C static libraries that contain categories on existing classes.</p>
+</blockquote>
+</li>
+</ol>
+<p>简而言之：-ObjC让linker加载静态库中所有的object file(object file：contains executable functions and static data，也就是我们所说的 *.o文件)，当然包含category，解决👆的问题。同时也引入了另外一个问题，就是把项目中没有使用到的类也加载到最后的可执行文件了，那就开始我们的优化吧…<br>慢着，先看看下面的关于参数ObjC对app包大小影响的测试：<br><img src="20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/c.png" alt="logo"><br><img src="20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/d.png" alt="logo"></p>
+<h3 id="引出本文主题"><a href="#引出本文主题" class="headerlink" title="引出本文主题"></a>引出本文主题</h3><p>通过👆的介绍我们已经知道了，优化的点就是移除静态库中“可执行文件”中的无用的类。先来看看静态的framework的样子：<br><img src="20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/e.png" alt="logo"><br>如果你不知如何创建static framework的话，可以看看这个步骤：<a href="http://www.jianshu.com/p/ef3d5b7e7006?utm_campaign=hugo&utm_medium=reader_share&utm_content=note&utm_source=qq" target="_blank" rel="noopener">创建静态framework库详解</a><br>那么如何移除‘可执行文件’中的类呢？请看👇的lipo、ar命令</p>
+<h2 id="基本的lipo、ar-命令介绍"><a href="#基本的lipo、ar-命令介绍" class="headerlink" title="基本的lipo、ar 命令介绍"></a>基本的lipo、ar 命令介绍</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">（1）查看其支持的架构：lipo -info Test_Fra</span><br><span class="line">╰─$ lipo -info Test_Fra                                                                1 ↵</span><br><span class="line">	Architectures in the fat file: Test_Fra are: armv7 arm64</span><br><span class="line">（2）提取一个架构：lipo Test_Fra -thin armv7 -output armv7</span><br><span class="line">	会得到 armv7（它是只支持armv7）</span><br><span class="line">（3）查看armv7类型：lipo -info armv7</span><br><span class="line">	input file armv7 is not a fat file</span><br><span class="line">	Non-fat file: armv7 is architecture: armv7</span><br><span class="line">（4）查看改framework的组成：ar -t armv7</span><br><span class="line">	__.SYMDEF SORTED</span><br><span class="line">	Teacher.o</span><br><span class="line">	Person+MyCategory.o</span><br><span class="line">	HHH.o</span><br><span class="line">	Person.o</span><br><span class="line">	Student.o</span><br><span class="line">	School.o</span><br><span class="line">	Test_Fra_vers.o</span><br><span class="line">（4）创建文件夹armv7_dir，并把armv7移动到armv7_dir下</span><br><span class="line">（5）进入文件夹armv7_dir，提取其mach-o文件：ar xv armv7</span><br><span class="line">	x - __.SYMDEF SORTED</span><br><span class="line">	x - Person.o</span><br><span class="line">	x - Student.o</span><br><span class="line">	x - Test_Fra_vers.o</span><br><span class="line">（6）删除指定的.o文件，比如Student.o，然后 合并剩下的所有的.o</span><br><span class="line">	重新生成静态文件：ar rcs armv7 armv7_dir/*.o</span><br><span class="line">（7）查看生成的arch：ar -t armv7（发现的确Student.o没有了）</span><br><span class="line">	__.SYMDEF SORTED</span><br><span class="line">	HHH.o</span><br><span class="line">	Person+MyCategory.o</span><br><span class="line">	Person.o</span><br><span class="line">	School.o</span><br><span class="line">	Teacher.o</span><br><span class="line">	Test_Fra_vers.o</span><br><span class="line">（8）⚠️直接删除arch中的 Student.o文件(不用手动拆为mach-o-list，这一个命令可以代替上面几个命令的组合)⚠️</span><br><span class="line">	&gt; ar -d -sv armv7 Student.o</span><br><span class="line">	</span><br><span class="line">（9）合并两个.a文件：lipo -create armv7 arm64 -output Test_Fra_new</span><br></pre></td></tr></table></figure>
+
+<h2 id="我的思路"><a href="#我的思路" class="headerlink" title="我的思路"></a>我的思路</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">1，拆分framework-&gt;获取mach-o列表（比如A.o B.o C.o...）</span><br><span class="line">2，拆分framework-&gt; 获得支持的架构类型supports archs（比如：armv7,arm64...）</span><br><span class="line">3,开始遍历：</span><br><span class="line">for mach-o-one in mach-o-list</span><br><span class="line">	for arch in supports archs</span><br><span class="line">		用`ar -d`命令删除arch 中的mach-o-one</span><br><span class="line">	把每个新的arch组合成新的framework</span><br><span class="line">	xcodebuild是否成功? 成功：把mach-o-one添加到can_remove_mach_o_list中</span><br><span class="line">	if len(can_remove_mach_o_list)==0:</span><br><span class="line">		pass</span><br><span class="line">	elif all_mach_o_names == can_remove_mach_o_list:</span><br><span class="line">		safe_log(&apos;current framework that the project did not used: &apos;+framework_name)</span><br><span class="line">	else:</span><br><span class="line">		移除can_remove_mach_o_list中所有的文件，并生成新的framework。</span><br><span class="line">		# 开启递归前需要删除 backup</span><br><span class="line">		safe_remove_path(framework_name+&apos;_backup&apos;)</span><br><span class="line">		# 开始递归</span><br><span class="line">		do_one_framework(path)</span><br><span class="line">			</span><br><span class="line">⚠️为什么需要递归？？？⚠️</span><br><span class="line">原因：只for一次不能删除全部</span><br><span class="line">比如：A.o 、 B.o</span><br><span class="line">	B 中#import A，那么在删除A时，build失败。而在demo中并没有使用A，却不能删除A，导致删除不完整！</span><br><span class="line">解决方案：递归上面的的代码</span><br></pre></td></tr></table></figure>
+
+<h2 id="我的demo"><a href="#我的demo" class="headerlink" title="我的demo"></a>我的demo</h2><p>我的代码布局大概是：<br><img src="20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/f.png" alt="logo"><br><img src="20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/g.png" alt="logo"></p>
+<h2 id="python脚本"><a href="#python脚本" class="headerlink" title="python脚本"></a>python脚本</h2><p>作用：</p>
+<ol>
+<li>通过执行该脚本，可以自动移除项目中的所有第三方framework可以移除的mach-o，达到瘦身的目的。</li>
+<li>如果整个framework在项目中都没有使用的话，需要手动删除，它的信息在log.txt（在项目目录下生成的log信息文件）中</li>
+</ol>
+<p>使用格式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># python thin_framework.py project_path target_folder_path</span><br><span class="line"># 0 : python_script_path 【必填】</span><br><span class="line"># 1 : project_path	【必填】</span><br><span class="line"># 2 : target_folder_path 【选填】需要检查 Framework的文件夹，默认为 project_path</span><br></pre></td></tr></table></figure>
+
+<p>举个例子，在命令行输入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; python thin_framework.py &apos;/Users/wangdt/XcodeSpace/TestView&apos;</span><br></pre></td></tr></table></figure>
+
+<p>执行python脚本前<br><img src="20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/h.png" alt="logo"></p>
+<p>执行python脚本<br><img src="20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/i.png" alt="logo"></p>
+<p>执行python脚本后，请对比一下<br><img src="20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/j.png" alt="logo"></p>
+<p>对于项目引入了，但是却完全没有用到的Framework，为了安全脚本不会帮你删除它，需要你确认后手动删除*.framework，这样的framework会在log.txt中打印出来，效果如下：<br><img src="20170825app%E7%98%A6%E8%BA%AB%E4%B9%8B%E7%A7%BB%E9%99%A4%E6%97%A0%E7%94%A8macho%E6%96%87%E4%BB%B6/k.png" alt="logo"></p>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><h3 id="使用注意"><a href="#使用注意" class="headerlink" title="使用注意"></a>使用注意</h3><ol>
+<li>使用时，你最好用你自己的手机来编译而不是使用模拟器，毕竟咱们上传appstore时，是为了让手机用户使用的。</li>
+<li>当前demo没有使用workspace，如果使用workspace需要修改python 中编译项目的命令： xcodebuild的方式。<h3 id="本方案的不足"><a href="#本方案的不足" class="headerlink" title="本方案的不足"></a>本方案的不足</h3>对runtime时才确定的东西，不能在编译时确定，需要回归测试才能判断 删除是否成功。<br>比如：performselector 执行的方法</li>
+</ol>
+<p><strong>runtime才确定的方法</strong><br>在程序运行中动态使用的performselector调用static framework中的方法，在运行时才会确定方法是否存在，build肯定是无法捕获的。</p>
+<p><strong>category里的方法</strong><br>如果我们删除了category的方法， 比如直接把Mach-o删除的话， build时是不会报错的。原因和 linker symbol有关，解释如下：</p>
+<p>代码build后一般会执行如下步骤：预处理、编译、汇编、链接<br>拿出其中的编译、link来说说<br>（1）编译：检查语法上的错误，比如使用.h中没有提供的方法<br>（2）link：把含有symbol的 .o file加载到final exe中</p>
+<p><strong>举个例子</strong><br>项目中的A.m使用了libB中 B 的testB()，现在删除B.o，然后编译项目。<br>第一步编译：通过的，因为每个framework都有一个.h集合，其中就有A.h。<br>第二步link：由于A.m使用B，则在A.o中会生成关于B的 undefine symbol，而B.o被删掉了，就找不到该symbol了，就会link报错。</p>
+<p>项目中的A.m使用了libB中 B+safe 的 test_safe()方法，libB中有个class B 以及 B+safe分类test_safe()方法，现在删除B+safe.o，然后编译项目。<br>第一步编译：通过，原因同上<br>第二步link：由于A.m使用B+safe，假如使用方式是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">B *b = [B new];</span><br><span class="line">[b test_safe];</span><br></pre></td></tr></table></figure>
+
+<p>那么在A.o中会生成关于 class B 的 undefine symbol，而这个symbol是B.o，linker会把B.o 加载到final exe中（过程中 B+safe.o 并不对应任何symbol，就不会被linker主动加载）</p>
+<p>参考：<br><a href="https://mp.weixin.qq.com/s?__biz=MzA4MjA0MTc4NQ==&mid=504089563&idx=1&sn=9328409758177cb6df3edbb3b8a0c161#rd" target="_blank" rel="noopener">移除无用的mach-o文件</a><br><a href="https://developer.apple.com/library/content/qa/qa1490/_index.html#top" target="_blank" rel="noopener">apple官方介绍linker</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/12/20170712线程安全之gcd/" rel="next" title="线程安全之gcd">
+                <i class="fa fa-chevron-left"></i> 线程安全之gcd
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/11/20170911从-dyld-到-runtime/" rel="prev" title="从 dyld 到 runtime">
+                从 dyld 到 runtime <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTMzNy81OTA1"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">wangdetong</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#静态库中catergory问题、linker、symbol"><span class="nav-number">1.1.</span> <span class="nav-text">静态库中catergory问题、linker、symbol</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#other-linker-flags解决问题"><span class="nav-number">1.2.</span> <span class="nav-text">other linker flags解决问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#引出本文主题"><span class="nav-number">1.3.</span> <span class="nav-text">引出本文主题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本的lipo、ar-命令介绍"><span class="nav-number">2.</span> <span class="nav-text">基本的lipo、ar 命令介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#我的思路"><span class="nav-number">3.</span> <span class="nav-text">我的思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#我的demo"><span class="nav-number">4.</span> <span class="nav-text">我的demo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#python脚本"><span class="nav-number">5.</span> <span class="nav-text">python脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注意事项"><span class="nav-number">6.</span> <span class="nav-text">注意事项</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用注意"><span class="nav-number">6.1.</span> <span class="nav-text">使用注意</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本方案的不足"><span class="nav-number">6.2.</span> <span class="nav-text">本方案的不足</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangdetong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

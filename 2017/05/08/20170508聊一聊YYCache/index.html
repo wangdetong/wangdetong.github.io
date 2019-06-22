@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-cn">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="最近拜读了一下YYCache的源码，发现ibireme大神对内存优化的独特风格值得学习。查了一些网上的资源，找到一些比较有用的信息，在这里说一说…">
+<meta property="og:type" content="article">
+<meta property="og:title" content="聊一聊YYCache">
+<meta property="og:url" content="http://yoursite.com/2017/05/08/20170508聊一聊YYCache/index.html">
+<meta property="og:site_name" content="iKiwi">
+<meta property="og:description" content="最近拜读了一下YYCache的源码，发现ibireme大神对内存优化的独特风格值得学习。查了一些网上的资源，找到一些比较有用的信息，在这里说一说…">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:image" content="http://yoursite.com/2017/05/08/20170508聊一聊YYCache/20170508%E8%81%8A%E4%B8%80%E8%81%8AYYCache/a.png">
+<meta property="og:image" content="http://yoursite.com/2017/05/08/20170508聊一聊YYCache/20170508%E8%81%8A%E4%B8%80%E8%81%8AYYCache/b.png">
+<meta property="og:updated_time" content="2019-06-22T03:32:12.583Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="聊一聊YYCache">
+<meta name="twitter:description" content="最近拜读了一下YYCache的源码，发现ibireme大神对内存优化的独特风格值得学习。查了一些网上的资源，找到一些比较有用的信息，在这里说一说…">
+<meta name="twitter:image" content="http://yoursite.com/2017/05/08/20170508聊一聊YYCache/20170508%E8%81%8A%E4%B8%80%E8%81%8AYYCache/a.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/05/08/20170508聊一聊YYCache/">
+
+
+
+
+
+  <title>聊一聊YYCache | iKiwi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">iKiwi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/08/20170508聊一聊YYCache/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">聊一聊YYCache</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-08T00:00:00+08:00">
+                2017-05-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近拜读了一下YYCache的源码，发现ibireme大神对内存优化的独特风格值得学习。查了一些网上的资源，找到一些比较有用的信息，在这里说一说…</p>
+<a id="more"></a>
+<h2 id="YYCache的概要"><a href="#YYCache的概要" class="headerlink" title="YYCache的概要"></a>YYCache的概要</h2><h3 id="结构图"><a href="#结构图" class="headerlink" title="结构图"></a>结构图</h3><p>简单的看一下代码结构，盗个图来表示<br><img src="20170508%E8%81%8A%E4%B8%80%E8%81%8AYYCache/a.png" alt="logo"></p>
+<h3 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h3><h4 id="简单对比："><a href="#简单对比：" class="headerlink" title="简单对比："></a>简单对比：</h4><p><img src="20170508%E8%81%8A%E4%B8%80%E8%81%8AYYCache/b.png" alt="logo"><br>备注：TMCache的同步读操作是通过dispatch_semaphore_t阻碍当前线程，异步获取value</p>
+<h4 id="简单说一下-NSCache"><a href="#简单说一下-NSCache" class="headerlink" title="简单说一下 NSCache"></a>简单说一下 NSCache</h4><p>NSCache 是苹果提供的一个简单的内存缓存，它有着和 NSDictionary 类似的 API，不同点是它是线程安全的，并且不会 retain key。我在测试时发现了它的几个特点：NSCache 底层并没有用 NSDictionary 等已有的类，而是直接调用了 libcache.dylib，其中线程安全是由 pthread_mutex 完成的。另外，它的性能和 key 的相似度有关，如果有大量相似的 key (比如 “1”, “2”, “3”, …)，NSCache 的存取性能会下降得非常厉害，大量的时间被消耗在 CFStringEqual() 上，不知这是不是 NSCache 本身设计的缺陷。</p>
+<h4 id="不再安全的-OSSpinLock"><a href="#不再安全的-OSSpinLock" class="headerlink" title="不再安全的 OSSpinLock"></a>不再安全的 OSSpinLock</h4><p><a href="https://blog.ibireme.com/2016/01/16/spinlock_is_unsafe_in_ios/" target="_blank" rel="noopener">不再安全的 OSSpinLock</a><br>自从 OSSpinLock 被公布不安全，第三方库纷纷用pthread_mutex 替换 OSSpinLock。<br>OSSpinLock不安全的主要原因发生在低优先级线程拿到锁时，高优先级线程进入忙等(busy-wait)状态，消耗大量 CPU 时间，从而导致低优先级线程拿不到 CPU 时间，也就无法完成任务并释放锁。这种问题被称为优先级反转。</p>
+<h2 id="YYCache的优势"><a href="#YYCache的优势" class="headerlink" title="YYCache的优势"></a>YYCache的优势</h2><h3 id="MemoryCache"><a href="#MemoryCache" class="headerlink" title="MemoryCache"></a>MemoryCache</h3><p>TMMemoryCache 的同步访问的逻辑，内部是把操作放到其他线程去执行，等待其完成后再回到当前线程（通过dispatch_semaphore_t实现的），这就会让同步访问的方法内部产生线程切换等很重的操作， 性能就会非常差并存在造成死锁的风险</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">id</span>)objectForKey:(<span class="built_in">NSString</span> *)key&#123;</span><br><span class="line"><span class="comment">//...</span></span><br><span class="line">    dispatch_semaphore_t semaphore = dispatch_semaphore_create(<span class="number">0</span>);</span><br><span class="line">    [<span class="keyword">self</span> objectForKey:key block:^(TMMemoryCache *cache, <span class="built_in">NSString</span> *key, <span class="keyword">id</span> object) &#123;</span><br><span class="line">        objectForKey = object;</span><br><span class="line">        dispatch_semaphore_signal(semaphore);</span><br><span class="line">    &#125;];</span><br><span class="line">    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);</span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>PINMemoryCache 同步读的时候，是真正的同步读，并且用信号量控制了同步读在并发队列的并行量，避免了线程切换带来的巨大开销，也避免了可能的死锁，这性能就没问题了。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">nullable</span> <span class="keyword">id</span>)objectForKey:(<span class="built_in">NSString</span> *)key</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (!key)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSDate</span> *now = [[<span class="built_in">NSDate</span> alloc] init];</span><br><span class="line">    [<span class="keyword">self</span> lock];</span><br><span class="line">    <span class="keyword">id</span> object = <span class="literal">nil</span>;</span><br><span class="line">    <span class="comment">// If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive</span></span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">self</span>-&gt;_ttlCache || <span class="keyword">self</span>-&gt;_ageLimit &lt;= <span class="number">0</span> || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) &lt; <span class="keyword">self</span>-&gt;_ageLimit) &#123;</span><br><span class="line">        object = _dictionary[key];</span><br><span class="line">    &#125;</span><br><span class="line">    [<span class="keyword">self</span> unlock];</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 维护 _dates字典 -&gt; LRU</span></span><br><span class="line">    <span class="keyword">if</span> (object) &#123;</span><br><span class="line">        [<span class="keyword">self</span> lock];</span><br><span class="line">        _dates[key] = now;</span><br><span class="line">        [<span class="keyword">self</span> unlock];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> object;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>YYMemoryCache 缓存内部用双向链表和 NSDictionary 实现了 LRU 淘汰算法，而TMMemoryCache &amp; PINMemoryCache 通过维护一个dictio记录object 最后一次访问的时间，通过排序时间来实现的LRU，YYMemoryCache相对于它们算是一点进步吧</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">id</span>)objectForKey:(<span class="keyword">id</span>)key &#123;</span><br><span class="line">    <span class="keyword">if</span> (!key) <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">    pthread_mutex_lock(&amp;_lock);</span><br><span class="line">    <span class="comment">// node对象中的 _value就是查询的值，_time记录当前时间-&gt;LRU</span></span><br><span class="line">    _YYLinkedMapNode *node = <span class="built_in">CFDictionaryGetValue</span>(_lru-&gt;_dic, (__bridge <span class="keyword">const</span> <span class="keyword">void</span> *)(key));</span><br><span class="line">    <span class="keyword">if</span> (node) &#123;</span><br><span class="line">        node-&gt;_time = <span class="built_in">CACurrentMediaTime</span>();</span><br><span class="line">        [_lru bringNodeToHead:node];</span><br><span class="line">    &#125;</span><br><span class="line">    pthread_mutex_unlock(&amp;_lock);</span><br><span class="line">    <span class="keyword">return</span> node ? node-&gt;_value : <span class="literal">nil</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="DiskCache"><a href="#DiskCache" class="headerlink" title="DiskCache"></a>DiskCache</h3><p>TMDiskCache &amp; PINDiskCache 都是基于文件系统的， 即一个 Value 对应一个文件 ，通过文件读写来缓存数据。他们的实现都比较简单，性能也都相近，缺点也是同样的：不方便扩展、没有元数据、难以实现较好的淘汰算法、数据统计缓慢。</p>
+<p>YYDiskCache 采用了 SQLite &amp; 文件系统 一起的方式实现的。作者测试SQLite发现：</p>
+<ul>
+<li>单条数据小于 20K 时，SQLite读取性能越高</li>
+<li>单条数据大于 20K 时，写文件更快</li>
+<li>所以YYDiskCache就以20k作为判断使用哪种方式的条件</li>
+</ul>
+<h2 id="内存优化-😄亮点"><a href="#内存优化-😄亮点" class="headerlink" title="内存优化 😄亮点"></a>内存优化 😄亮点</h2><p>看源码时，对[holder count]; // release in queue感到不解。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (holder.count) &#123;</span><br><span class="line">    <span class="built_in">dispatch_queue_t</span> queue = _lru-&gt;_releaseOnMainThread ? dispatch_get_main_queue() : YYMemoryCacheGetReleaseQueue();</span><br><span class="line">    <span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">        [holder count]; <span class="comment">// release in queue</span></span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>查了一下<a href="https://blog.ibireme.com/2015/11/12/smooth_user_interfaces_for_ios/" target="_blank" rel="noopener">作者的blog</a>，发现原因如下：</p>
+<ol>
+<li><p>让block来retain一下对象？<br>应该是holder在执行完这个方法后就出了作用域了，reference会减1，但是此时holder不会被dealloc，因为block 中retain了node，使得holder的reference count为1，当执完block后，holder的reference count又-1，此时node就会在block对应的queue上release了。的确很巧妙！😄</p>
+</li>
+<li><p>为什么需要在指定queue销毁对象？<br>放到其他线程去销毁对象，减轻当前线程压力，一般都是减轻main thread的压力</p>
+</li>
+</ol>
+<blockquote>
+<p>iOS保持界面流畅的技巧 对象的销毁虽然消耗资源不多，但累积起来也是不容忽视的。通常当容器类持有大量对象时，其销毁时的资源消耗就非常明显。同样的，如果对象可以放到后台线程去释放，那就挪到后台线程去</p>
+</blockquote>
+<h2 id="定时检查-gt-LUR"><a href="#定时检查-gt-LUR" class="headerlink" title="定时检查-&gt;LUR"></a>定时检查-&gt;LUR</h2><p>通过 dispatch_after延时递归实现 定时器的效果</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)_trimRecursively &#123;</span><br><span class="line">    __<span class="keyword">weak</span> <span class="keyword">typeof</span>(<span class="keyword">self</span>) _<span class="keyword">self</span> = <span class="keyword">self</span>;</span><br><span class="line">    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_autoTrimInterval * <span class="built_in">NSEC_PER_SEC</span>)), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, <span class="number">0</span>), ^&#123;</span><br><span class="line">        __<span class="keyword">strong</span> <span class="keyword">typeof</span>(_<span class="keyword">self</span>) <span class="keyword">self</span> = _<span class="keyword">self</span>;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">self</span>) <span class="keyword">return</span>;</span><br><span class="line">        [<span class="keyword">self</span> _trimInBackground];</span><br><span class="line">        [<span class="keyword">self</span> _trimRecursively];</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="为什么使用pthread-mutex-trylock"><a href="#为什么使用pthread-mutex-trylock" class="headerlink" title="为什么使用pthread_mutex_trylock"></a>为什么使用<code>pthread_mutex_trylock</code></h2><p>有些人可能不知道，在<code>pthread_mutex</code>中函数返回值为0代表成功，非0代表各种错误！<br><a href="http://docs.oracle.com/cd/E19253-01/819-7051/6n919hpag/index.html" target="_blank" rel="noopener">pthread_mutex详解</a></p>
+<p>源码中，用<code>pthread_mutex_trylock</code> 来尝试获取锁，为什么不直接加锁呢？原因是：尽量避免与其他访问线程产生冲突，毕竟删除过期数据的优先级不高。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSMutableArray</span> *holder = [<span class="built_in">NSMutableArray</span> new];</span><br><span class="line"><span class="keyword">while</span> (!finish) &#123;</span><br><span class="line">    <span class="keyword">if</span> (pthread_mutex_trylock(&amp;_lock) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (_lru-&gt;_totalCost &gt; costLimit) &#123;</span><br><span class="line">            _YYLinkedMapNode *node = [_lru removeTailNode];</span><br><span class="line">            <span class="keyword">if</span> (node) [holder addObject:node];</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            finish = <span class="literal">YES</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        pthread_mutex_unlock(&amp;_lock);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        usleep(<span class="number">10</span> * <span class="number">1000</span>); <span class="comment">//10 ms</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用注意"><a href="#使用注意" class="headerlink" title="使用注意"></a>使用注意</h2><p>使用YYCache时 如果需要DiskCache的话， object 需要遵循NSCoding，如果只需要MemoryCache，可以不用遵循NSCoding，当然可以直接使用YYMemoryCache。<br>简单使用YYCache，来测试一下 LRU。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)testLRU &#123;</span><br><span class="line">    YYCache *yyCache=[YYCache cacheWithName:<span class="string">@"LCJCache"</span>];</span><br><span class="line">    </span><br><span class="line">    [yyCache.memoryCache setCountLimit:<span class="number">50</span>];<span class="comment">//内存最大缓存数据个数</span></span><br><span class="line">    [yyCache.memoryCache setCostLimit:<span class="number">1</span>*<span class="number">1024</span>];<span class="comment">//内存最大缓存开销 目前这个毫无用处</span></span><br><span class="line">    [yyCache.diskCache setCostLimit:<span class="number">10</span>*<span class="number">1024</span>];<span class="comment">//磁盘最大缓存开销</span></span><br><span class="line">    [yyCache.diskCache setCountLimit:<span class="number">50</span>];<span class="comment">//磁盘最大缓存数据个数</span></span><br><span class="line">    [yyCache.diskCache setAutoTrimInterval:<span class="number">60</span>];<span class="comment">//设置磁盘lru动态清理频率 默认 60秒</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span> ;i&lt;<span class="number">100</span>;i++)&#123;</span><br><span class="line">        <span class="comment">//模拟数据</span></span><br><span class="line">        <span class="built_in">NSString</span> *value=<span class="string">@"I want to know who is lcj ?"</span>;</span><br><span class="line">        <span class="comment">//模拟一个key</span></span><br><span class="line">        <span class="built_in">NSString</span> *key=[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"key%d"</span>,i];</span><br><span class="line">        [yyCache setObject:value forKey:key];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"yyCache.memoryCache.totalCost:%lu"</span>,(<span class="keyword">unsigned</span> <span class="keyword">long</span>)yyCache.memoryCache.totalCost);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"yyCache.memoryCache.costLimit:%lu"</span>,(<span class="keyword">unsigned</span> <span class="keyword">long</span>)yyCache.memoryCache.costLimit);</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"yyCache.memoryCache.totalCount:%lu"</span>,(<span class="keyword">unsigned</span> <span class="keyword">long</span>)yyCache.memoryCache.totalCount);</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"yyCache.memoryCache.countLimit:%lu"</span>,(<span class="keyword">unsigned</span> <span class="keyword">long</span>)yyCache.memoryCache.countLimit);</span><br><span class="line">    </span><br><span class="line">    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(<span class="number">120</span> * <span class="built_in">NSEC_PER_SEC</span>)), dispatch_get_main_queue(), ^&#123;</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"yyCache.diskCache.totalCost:%lu"</span>,(<span class="keyword">unsigned</span> <span class="keyword">long</span>)yyCache.diskCache.totalCost);</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"yyCache.diskCache.costLimit:%lu"</span>,(<span class="keyword">unsigned</span> <span class="keyword">long</span>)yyCache.diskCache.costLimit);</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"yyCache.diskCache.totalCount:%lu"</span>,(<span class="keyword">unsigned</span> <span class="keyword">long</span>)yyCache.diskCache.totalCount);</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"yyCache.diskCache.countLimit:%lu"</span>,(<span class="keyword">unsigned</span> <span class="keyword">long</span>)yyCache.diskCache.countLimit);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span> ;i&lt;<span class="number">100</span>;i++)&#123;</span><br><span class="line">            <span class="comment">//模拟一个key</span></span><br><span class="line">            <span class="built_in">NSString</span> *key=[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"key%d"</span>,i];</span><br><span class="line">            <span class="keyword">id</span> vuale=[yyCache objectForKey:key];</span><br><span class="line">            <span class="built_in">NSLog</span>(<span class="string">@"key ：%@ value : %@"</span>,key ,vuale);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>参考：<br><a href="https://blog.ibireme.com/2015/10/26/yycache/" target="_blank" rel="noopener">YYCache 设计思路</a><br><a href="https://blog.ibireme.com/2016/01/16/spinlock_is_unsafe_in_ios/" target="_blank" rel="noopener">不再安全的 OSSpinLock</a><br><a href="https://blog.ibireme.com/2015/11/12/smooth_user_interfaces_for_ios/" target="_blank" rel="noopener">iOS 保持界面流畅的技巧</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/02/20170402AppleScript让iMessage更好玩/" rel="next" title="AppleScript让iMessage更好玩">
+                <i class="fa fa-chevron-left"></i> AppleScript让iMessage更好玩
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/11/20170611线程安全之锁/" rel="prev" title="线程安全之锁">
+                线程安全之锁 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTMzNy81OTA1"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">wangdetong</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#YYCache的概要"><span class="nav-number">1.</span> <span class="nav-text">YYCache的概要</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#结构图"><span class="nav-number">1.1.</span> <span class="nav-text">结构图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#锁"><span class="nav-number">1.2.</span> <span class="nav-text">锁</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#简单对比："><span class="nav-number">1.2.1.</span> <span class="nav-text">简单对比：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#简单说一下-NSCache"><span class="nav-number">1.2.2.</span> <span class="nav-text">简单说一下 NSCache</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#不再安全的-OSSpinLock"><span class="nav-number">1.2.3.</span> <span class="nav-text">不再安全的 OSSpinLock</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YYCache的优势"><span class="nav-number">2.</span> <span class="nav-text">YYCache的优势</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MemoryCache"><span class="nav-number">2.1.</span> <span class="nav-text">MemoryCache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DiskCache"><span class="nav-number">2.2.</span> <span class="nav-text">DiskCache</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存优化-😄亮点"><span class="nav-number">3.</span> <span class="nav-text">内存优化 😄亮点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定时检查-gt-LUR"><span class="nav-number">4.</span> <span class="nav-text">定时检查-&gt;LUR</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么使用pthread-mutex-trylock"><span class="nav-number">5.</span> <span class="nav-text">为什么使用pthread_mutex_trylock</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用注意"><span class="nav-number">6.</span> <span class="nav-text">使用注意</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangdetong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

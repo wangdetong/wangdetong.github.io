@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-cn">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="三种延时方式  dispatch_after NSTimer performSelector:withObject:afterDelay">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于延时操作一二">
+<meta property="og:url" content="http://yoursite.com/2016/03/20/20160320关于延时操作一二/index.html">
+<meta property="og:site_name" content="iKiwi">
+<meta property="og:description" content="三种延时方式  dispatch_after NSTimer performSelector:withObject:afterDelay">
+<meta property="og:locale" content="zh-cn">
+<meta property="og:updated_time" content="2019-06-22T03:32:12.348Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于延时操作一二">
+<meta name="twitter:description" content="三种延时方式  dispatch_after NSTimer performSelector:withObject:afterDelay">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/03/20/20160320关于延时操作一二/">
+
+
+
+
+
+  <title>关于延时操作一二 | iKiwi</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-cn">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">iKiwi</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/03/20/20160320关于延时操作一二/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangdetong">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="iKiwi">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">关于延时操作一二</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-03-20T00:00:00+08:00">
+                2016-03-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>三种延时方式</p>
+<ul>
+<li>dispatch_after</li>
+<li>NSTimer</li>
+<li>performSelector:withObject:afterDelay<a id="more"></a>
+<h2 id="dispatch-after"><a href="#dispatch-after" class="headerlink" title="dispatch_after"></a>dispatch_after</h2><blockquote>
+<p>Schedule a block for execution on a given queue at a specified time.</p>
+</blockquote>
+</li>
+</ul>
+<p><code>dispatch_after是延迟提交，不是延迟运行！</code> 即将执行Block在指定的延时后，加入到指定的队列中，而不是在特定的时间后立即运行！</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建串行队列</span></span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">"me.wangdt.gcd"</span>, DISPATCH_QUEUE_SERIAL);</span><br><span class="line"><span class="comment">//立即打印一条信息</span></span><br><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"...begin..."</span>);</span><br><span class="line"><span class="comment">//5 秒以后把block提交的queue中</span></span><br><span class="line">dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(<span class="number">5</span> * <span class="built_in">NSEC_PER_SEC</span>)), queue, ^&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"...dispatch_after..."</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">//提交一个block</span></span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">    <span class="comment">//Sleep 10秒</span></span><br><span class="line">    [<span class="built_in">NSThread</span> sleepForTimeInterval:<span class="number">10</span>];</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"...first block done..."</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>打印顺序：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">2016-03-20 00:16:16.212 test[53430:955424] ...begin...</span><br><span class="line">2016-03-20 00:16:26.278 test[53430:955512] ...first block done...</span><br><span class="line">2016-03-20 00:16:26.278 test[53430:955512] ...dispatch_after...</span><br></pre></td></tr></table></figure>
+
+<h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><p>相对而言，dispatch_after是不用考虑 子线程runloop的问题的👍，只是不能cancel task而已，通过一些其他的方式也是可以做到大概齐的，比如：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 维护一个 shouldExecuteDispatchBlock</span></span><br><span class="line">dispatch_after(dispatch_time(DISPATCH_TIME_NOW, <span class="number">1</span> * <span class="built_in">NSEC_PER_SEC</span>), dispatch_get_main_queue(), ^ &#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">self</span>.shouldExecuteDispatchBlock)&#123;</span><br><span class="line">        <span class="comment">// doSomething</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="dispatch-after-源码"><a href="#dispatch-after-源码" class="headerlink" title="dispatch_after 源码"></a>dispatch_after 源码</h3><p>1，当时间为0时，直接调用 dispatch_async()<br>2，底层使用了 dispatch_source 设置一个timer作为延时</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> dispatch_after(dispatch_time_t when, <span class="built_in">dispatch_queue_t</span> queue,</span><br><span class="line">		dispatch_block_t work)</span><br><span class="line">&#123;</span><br><span class="line">	_dispatch_after(when, queue, <span class="literal">NULL</span>, work, <span class="literal">true</span>);</span><br><span class="line">&#125;</span><br><span class="line">_dispatch_after(dispatch_time_t when, <span class="built_in">dispatch_queue_t</span> queue,</span><br><span class="line">		<span class="keyword">void</span> *ctxt, <span class="keyword">void</span> *handler, <span class="keyword">bool</span> block)</span><br><span class="line">&#123;</span><br><span class="line">	dispatch_timer_source_refs_t dt;</span><br><span class="line">	dispatch_source_t ds;</span><br><span class="line">	uint64_t leeway, delta;</span><br><span class="line">	<span class="comment">// ...省略</span></span><br><span class="line">	<span class="keyword">if</span> (delta == <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="keyword">if</span> (block) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="built_in">dispatch_async</span>(queue, handler);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> dispatch_async_f(queue, ctxt, handler);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// ...省略</span></span><br><span class="line">	<span class="comment">// this function can and should be optimized to not use a dispatch source</span></span><br><span class="line">	ds = dispatch_source_create(&amp;_dispatch_source_type_after, <span class="number">0</span>, <span class="number">0</span>, queue);</span><br><span class="line">	dt = ds-&gt;ds_timer_refs;</span><br><span class="line">	<span class="comment">// ...省略</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="NSTimer"><a href="#NSTimer" class="headerlink" title="NSTimer"></a>NSTimer</h2><p>两种创建方式</p>
+<blockquote>
+<p>Use the scheduledTimerWithTimeInterval:invocation:repeats:<br>or scheduledTimerWithTimeInterval:target:selector:userInfo:repeats:<br>class method to create the timer and schedule it on the current run loop in the default mode.</p>
+</blockquote>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSTimer</span> *scheduledTimer = [<span class="built_in">NSTimer</span> scheduledTimerWithTimeInterval:<span class="number">1</span> target:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(test:) userInfo:<span class="literal">nil</span> repeats:<span class="literal">NO</span>];</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Use the timerWithTimeInterval:invocation:repeats:<br>or timerWithTimeInterval:target:selector:userInfo:repeats:<br>class method to create the timer object without scheduling it on a run loop. (After creating it, you must add the timer to a run loop manually by calling the addTimer:forMode: method of the corresponding NSRunLoop object.)</p>
+</blockquote>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSTimer</span> *timer = [<span class="built_in">NSTimer</span> timerWithTimeInterval:<span class="number">1</span> target:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(test:) userInfo:<span class="literal">nil</span> repeats:<span class="literal">NO</span>];</span><br><span class="line">[[<span class="built_in">NSRunLoop</span> currentRunLoop] addTimer:timer forMode:<span class="built_in">NSDefaultRunLoopMode</span>];</span><br></pre></td></tr></table></figure>
+
+<p>⚠️使用注意⚠️</p>
+<p>当创建一个repeats=YES的NSTimer时，需要在合适的时间销毁并置空</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[timer invalidate];  </span><br><span class="line">timer = <span class="literal">nil</span>;</span><br></pre></td></tr></table></figure>
+
+<p>线程问题</p>
+<blockquote>
+<p>使用NSTimer 肯定需要把其放入runloop中的，无论是默认add 还是 手动add!</p>
+</blockquote>
+<ol>
+<li>在主线程中不用考虑这个，因为主线程runloop默认是开启的。</li>
+<li>如果在子线程中，没有手动开启当前线程的runloop :[[NSRunLoop currentRunLoop] run];，timer是不会被add到runloop中的，也就意味着 timer所指定的方法永远不会被执行。</li>
+<li>虽然说在主线程中不会考虑 runloop开启的问题，但是 如果自己封装过的代码让其他人来维护的时候，有可能将其放到子线程中并且没有开启runloop，导致出现问题。</li>
+</ol>
+<h2 id="performSelector-withObject-afterDelay"><a href="#performSelector-withObject-afterDelay" class="headerlink" title="performSelector:withObject:afterDelay"></a>performSelector:withObject:afterDelay</h2><p>官方介绍:</p>
+<blockquote>
+<p>This method sets up a timer to perform the aSelector message on the current thread’s run loop. The timer is configured to run in the default mode (NSDefaultRunLoopMode). When the timer fires, the thread attempts to dequeue the message from the run loop and perform the selector. It succeeds if the run loop is running and in the default mode; otherwise, the timer waits until the run loop is in the default mode.</p>
+</blockquote>
+<p>performSelector:withObject:afterDelay的底层是创建一个NSTimer(repeats为NO)，并把放到current runloop中。注意事项和NSTimer的差不多，只是不用维护这个NSTimer了，子线程的问题还是需要注意的！</p>
+<h3 id="performSelector-afterDelay配合cancel"><a href="#performSelector-afterDelay配合cancel" class="headerlink" title="performSelector:afterDelay配合cancel"></a>performSelector:afterDelay配合cancel</h3><p>通常用这种方式在主线程 取消重复刷新UI的操作:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[<span class="built_in">NSObject</span> cancelPreviousPerformRequestsWithTarget: <span class="keyword">self</span> selector:<span class="keyword">@selector</span>(refreshUI) object: <span class="literal">nil</span>];</span><br><span class="line">[<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(refreshUI) withObject: <span class="literal">nil</span> afterDelay:<span class="number">1</span>];</span><br></pre></td></tr></table></figure>
+
+<h3 id="cancel原理"><a href="#cancel原理" class="headerlink" title="cancel原理"></a>cancel原理</h3><p>基本概念</p>
+<ol>
+<li>[[NSRunLoop currentRunLoop] run]; ：开始next run loop cycle</li>
+<li>performSelector: withObject: afterDelay</li>
+</ol>
+<blockquote>
+<p>Performs the specified selector on the current thread during the next run loop cycle and after an optional delay period.</p>
+</blockquote>
+<p>在你在子线程运行 run loop 之前，你必须至少添加一输入源或定时器给它。 如果 run loop 没有任何源需要监视的话，它会在你启动之际立马退出</p>
+<h3 id="详细的例子⚠️"><a href="#详细的例子⚠️" class="headerlink" title="详细的例子⚠️"></a>详细的例子⚠️</h3><p>afterDelay的那个timer是放在哪了？还有timer是什么时候拿出来执行的吧。<br>在子线程打印比较直观：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//在子线程中，打印current runloop，查看timers变化，进而了解[[NSRunLoop currentRunLoop] run] 的作用</span></span><br><span class="line">  <span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">	<span class="built_in">NSLog</span>(<span class="string">@"currentRunLoop:%@"</span>,[<span class="built_in">NSRunLoop</span> currentRunLoop]);</span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">        timers = (null),</span></span><br><span class="line"><span class="comment">	*/</span></span><br><span class="line">	</span><br><span class="line">	[<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(test) withObject:<span class="literal">nil</span> afterDelay:<span class="number">1</span>];</span><br><span class="line">       <span class="built_in">NSLog</span>(<span class="string">@"currentRunLoop:%@"</span>,[<span class="built_in">NSRunLoop</span> currentRunLoop]);</span><br><span class="line">       <span class="comment">/*</span></span><br><span class="line"><span class="comment">        timers = &lt;CFArray 0x6000000ba0a0 [0x108ef6df0]&gt;&#123;type = mutable-small, count = 1, values = (...&#125;,</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">       </span><br><span class="line">       [[<span class="built_in">NSRunLoop</span> currentRunLoop] run];</span><br><span class="line">       </span><br><span class="line">       <span class="built_in">NSLog</span>(<span class="string">@"currentRunLoop:%@"</span>,[<span class="built_in">NSRunLoop</span> currentRunLoop]); </span><br><span class="line">       <span class="comment">/*</span></span><br><span class="line"><span class="comment">        timers = &lt;CFArray 0x6000000ba0a0 [0x108ef6df0]&gt;&#123;type = mutable-small, count = 0, values = ()&#125;,</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">   &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>通过上面的打印可以看出来：timer是放到runloop的 timers数组中了，在[runloop run]开启下一次run loop cycle的时候，观察者会去执行timers中的timer。<br>那么只要在runloop run 之前，把timers中指定的timer cancel掉就行了，try一下:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// cancel成功了</span></span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">	[<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(test) withObject:<span class="literal">nil</span> afterDelay:<span class="number">1</span>];</span><br><span class="line">	[<span class="built_in">NSObject</span> cancelPreviousPerformRequestsWithTarget:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(test) object:<span class="literal">nil</span>];</span><br><span class="line">	[[<span class="built_in">NSRunLoop</span> currentRunLoop] run];</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>来看看另外一个例子，看看test方法被执行了几次？</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;<span class="number">10</span> ; i++) &#123;</span><br><span class="line">        [<span class="built_in">NSObject</span> cancelPreviousPerformRequestsWithTarget:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(test) object:<span class="literal">nil</span>];</span><br><span class="line">        [<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(test) withObject:<span class="literal">nil</span> afterDelay:<span class="number">1</span>];</span><br><span class="line">        [[<span class="built_in">NSRunLoop</span> currentRunLoop] run];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>答案是： 10次！<br>为什么？不是有cancel吗？<br>因为每次 cancel时 ，runloop中的timers 数组里的timer都执行了，即timers 的count=0，故会有10次。</p>
+<p>再看看下面的例子，test 会打印几次？</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;<span class="number">10</span> ; i++) &#123;</span><br><span class="line">		[<span class="built_in">NSObject</span> cancelPreviousPerformRequestsWithTarget:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(test) object:<span class="literal">nil</span>];</span><br><span class="line">		[<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(test) withObject:<span class="literal">nil</span> afterDelay:<span class="number">1</span>];</span><br><span class="line">	&#125;</span><br><span class="line">	[[<span class="built_in">NSRunLoop</span> currentRunLoop] run];</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>答案：1次。</p>
+<p>从上面的几个例子可以看出：cancel 是 从 runloop 的timers里面的 timer，也就是cancel next run loop cycle 的timer！！！</p>
+<h2 id="偏爱performSelector-withObject-afterDelay"><a href="#偏爱performSelector-withObject-afterDelay" class="headerlink" title="偏爱performSelector:withObject:afterDelay"></a>偏爱performSelector:withObject:afterDelay</h2><blockquote>
+<p>原因：👍在操作runloop的情况下performSelector:withObject:afterDelay中的selector 可以取消，而dispatcch_after 的block是延时提交入queue，还没有在queue中 不能被取消；</p>
+</blockquote>
+<p>场景: 在同一时刻，避免上层多次进行同一次网络请求，或者重复刷UI</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[<span class="built_in">NSObject</span> cancelPreviousPerformRequestsWithTarget:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(requestData:) object:<span class="literal">nil</span>];</span><br><span class="line">[<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(requestData:) withObject:<span class="literal">nil</span> afterDelay:<span class="number">1</span>];</span><br></pre></td></tr></table></figure>
+
+<p>对于上面曾提到的 子线程 runloop的情况，我一般会直接扔到主线程中执行：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_main_queue(), ^&#123;</span><br><span class="line">    [<span class="built_in">NSObject</span> cancelPreviousPerformRequestsWithTarget:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(requestData:) object:<span class="literal">nil</span>];</span><br><span class="line">    [<span class="keyword">self</span> performSelector:<span class="keyword">@selector</span>(requestData:) withObject:<span class="literal">nil</span> afterDelay:<span class="number">1</span>];</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/02/19/20160219异步-多线程？/" rel="next" title="异步==多线程？">
+                <i class="fa fa-chevron-left"></i> 异步==多线程？
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/04/07/20160407编码规范之OC新特性/" rel="prev" title="编码规范之OC新特性">
+                编码规范之OC新特性 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTMzNy81OTA1"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">wangdetong</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#dispatch-after"><span class="nav-number">1.</span> <span class="nav-text">dispatch_after</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#特点"><span class="nav-number">1.1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dispatch-after-源码"><span class="nav-number">1.2.</span> <span class="nav-text">dispatch_after 源码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NSTimer"><span class="nav-number">2.</span> <span class="nav-text">NSTimer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#performSelector-withObject-afterDelay"><span class="nav-number">3.</span> <span class="nav-text">performSelector:withObject:afterDelay</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#performSelector-afterDelay配合cancel"><span class="nav-number">3.1.</span> <span class="nav-text">performSelector:afterDelay配合cancel</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cancel原理"><span class="nav-number">3.2.</span> <span class="nav-text">cancel原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#详细的例子⚠️"><span class="nav-number">3.3.</span> <span class="nav-text">详细的例子⚠️</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#偏爱performSelector-withObject-afterDelay"><span class="nav-number">4.</span> <span class="nav-text">偏爱performSelector:withObject:afterDelay</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangdetong</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
